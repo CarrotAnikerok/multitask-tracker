@@ -37,7 +37,7 @@ export default class ExamplePlugin extends Plugin {
         const updatedLines = [
           ...lines.slice(0, section.lineStart + 1),
           newJsonText,
-          ...lines.slice(section.lineEnd)
+          ...lines.slice(section.lineEnd + 1)
         ];
 
         await this.app.vault.modify(file, updatedLines.join('\n'));

@@ -14,14 +14,6 @@
     overflow: hidden;
 }
 
-.habit-setting-button > button {
-    font-size: 0.5em;
-    padding: 0;
-    width: 3em;
-    height: 2em;
-    place-self: center center;
-}
-
 .custom-button {
     border-radius: 50%;
     height: 20px;
@@ -104,10 +96,20 @@ input {
     width: 80px;
 }
 
+/*Floating panels*/
+
 .panel-trigger {
     border: none;
     padding: 10px;
     border-radius: 4px;
+}
+
+.habit-setting-button > button {
+    font-size: 0.5em;
+    padding: 0;
+    width: 3em;
+    height: 2em;
+    place-self: center center;
 }
 
 .floating-panel {
@@ -116,10 +118,20 @@ input {
     width: 7em;
 }
 
-.floating-panel button {
+.edit-panel-buttons button {
     box-shadow: none;
     width: 8em;
     height: 2em;
     margin: 0;
     border-radius: 0;
+}
+
+.sort-panel {
+    display: flex;
+    gap: 1em;
+    background-color: var(--background-primary-alt);
+    font-size: var(--font-ui-smaller);
+    width: fit-content;
+    padding: 1em;
+    border-radius: 4px;
 }

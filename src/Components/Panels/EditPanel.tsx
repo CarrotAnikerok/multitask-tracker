@@ -12,7 +12,7 @@ export default function EditPanel({habit, handleEditing, handleDelete}: EditPane
         <div>
             <FloatingPanel className='habit-setting-button' 
                 content={(close) => (
-                <div>
+                <div className='edit-panel-buttons'>
                     <button onClick={() => {handleEditing(); close();}}>edit</button>
                     <button onClick={() => {handleDelete(habit); close();}}>delete</button>
                 </div>)}

@@ -20,7 +20,7 @@ export class ReactWidgetChild extends MarkdownRenderChild {
         const todayDate = new Date(new Date().setHours(0, 0, 0, 0));
 
         this.initialHabits = loadedHabits.map((h: HabitData) => {
-            const newHabit = new Habit(h.name, h.maxSize, h.color, h.size, h.id, h.lastPositiveUpdate, h.lastUpdate);
+            const newHabit = new Habit(h.name, h.maxSize, h.color, h.size, h.id, h.positiveUpdates, h.lastUpdate);
             newHabit.decreaseSizeDated(todayDate);
             return newHabit;
         })

@@ -4,7 +4,7 @@ export type HabitData = {
     maxSize: number;
     size: number;
     color: string;
-    lastPositiveUpdate: string;
+    positiveUpdates: string[];
     lastUpdate: string;
 }
 
@@ -13,7 +13,7 @@ export interface IHabit {
     size: number;
     maxSize: number;
     color: string;
-    lastPositiveUpdate: Date
+    positiveUpdates: Date[]
 }
 
 export class Habit implements IHabit {
@@ -24,18 +24,19 @@ export class Habit implements IHabit {
     size: number = 10;
     maxSize: number = 10;
 
-    lastPositiveUpdate: Date;
+    // i need days, not dates... but for sorting i need dates... hm i need to replace the last date if it the same day
+    positiveUpdates: Date[];
     private lastUpdate: Date;
 
     // может все-таки не воссоздавать объекты... а как-то по другому...
-    constructor(name: string, maxSize: number, color: string, size?: number, id?: string, date?: string, lastUpdate?: string) {
+    constructor(name: string, maxSize: number, color: string, size?: number, id?: string, positiveDates?: string[], lastUpdate?: string) {
         this.name = name;
         this.size = size ? size : maxSize;
         this.color = color;
         this.maxSize = maxSize;
         this.id = id ? id : this.generateCode();
-        this.lastPositiveUpdate = date ? new Date(date): new Date(new Date().setHours(0, 0, 0, 0));
-        this.lastUpdate = lastUpdate ?  new Date(lastUpdate): new Date(new Date().setHours(0, 0, 0, 0));
+        this.positiveUpdates = positiveDates ? positiveDates.map(d => new Date(d)): [new Date()];
+        this.lastUpdate = lastUpdate ?  new Date(lastUpdate): new Date();
     }
 
     changeSize(addedSize: number) {
@@ -47,8 +48,13 @@ export class Habit implements IHabit {
         }
 
         if (newSize > this.size) {
-            const date = new Date(new Date().setHours(0, 0, 0, 0));
-            this.lastPositiveUpdate = date;
+            const lastPositiveUpdate = this.positiveUpdates[this.positiveUpdates.length - 1]!;
+            const date = new Date();
+            if (lastPositiveUpdate.getDate() === date.getDate()) {
+                this.positiveUpdates[this.positiveUpdates.length - 1] =date;
+            } else {
+                this.positiveUpdates.push(date);
+            }
             this.lastUpdate = date;
         }
 
@@ -56,13 +62,16 @@ export class Habit implements IHabit {
     }
 
     // это бы тестами покрыть емае...
-    // можно будет добавить анимации для уменьшения полосочек только при заходе чтобы понять что упало
+    // TODO: можно будет добавить анимации для уменьшения полосочек только при заходе чтобы понять что упало
     decreaseSizeDated(today: Date) {
         const DAY_MS = 24 * 3600 * 1000;
         const daysFromLastCheck = this.getDaysBetween(this.lastUpdate, today);
+        const lastPositiveUpdate: Date = this.positiveUpdates[this.positiveUpdates.length - 1]!;
+        const lastPositiveUpdateDay = new Date(lastPositiveUpdate);
+        lastPositiveUpdateDay.setHours(0, 0, 0, 0);
 
-        if (daysFromLastCheck > 0 && this.lastPositiveUpdate.getTime() + DAY_MS < today.getTime()) {
-            const daysBetweenPositive = this.getDaysBetween(this.lastPositiveUpdate, today);
+        if (daysFromLastCheck > 0 && lastPositiveUpdateDay.getTime() + DAY_MS < today.getTime()) {
+            const daysBetweenPositive = this.getDaysBetween(lastPositiveUpdateDay, today);
             let resultSize = this.size;;
 
             // имеет ли это смысл...
