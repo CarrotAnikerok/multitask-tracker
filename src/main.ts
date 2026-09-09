@@ -1,114 +1,50 @@
-import {
-	Editor,
-	MarkdownView,
-	MarkdownFileInfo,
-	Modal,
-	Notice,
-	Plugin,
-} from 'obsidian';
-import {
-	DEFAULT_SETTINGS,
-	MyPluginSettings,
-	SampleSettingTab,
-} from './settings';
+import { Plugin } from 'obsidian';
+import { Habit, HabitData } from './Models/Habit';
+import { ReactWidgetChild } from './ReactWidgetChild';
 
-// Remember to rename these classes and interfaces!
+export default class ExamplePlugin extends Plugin {
+  async onload() {
+    this.registerMarkdownCodeBlockProcessor('multitask', (source, el, ctx) => {
+      const container = el.createDiv();
 
-export default class MyPlugin extends Plugin {
-	settings!: MyPluginSettings;
+      const getHabits = (): HabitData[] => {
+        try {
+          if (!source.trim()) {
+            return [];
+          }
 
-	async onload() {
-		await this.loadSettings();
+          return JSON.parse(source) as HabitData[];
+        } catch (e) {
+          console.error("Ошибка парсинга JSON в код-блоке multitask:", e);
+          return [];
+        }
+      }
 
-		// This creates an icon in the left ribbon.
-		this.addRibbonIcon('dice', 'Sample', (_evt: MouseEvent) => {
-			// Called when the user clicks the icon.
-			new Notice('This is a notice!');
-		});
+      const updateHabits = async (habits: Habit[]) => {
+        const section = ctx.getSectionInfo(el);
+        if (!section) {
+          return;
+        }
 
-		// This adds a status bar item to the bottom of the app. Does not work on mobile apps.
-		const statusBarItemEl = this.addStatusBarItem();
-		statusBarItemEl.setText('Status bar text');
+        const file = this.app.vault.getFileByPath(ctx.sourcePath);
+        if (!file) return;
 
-		// This adds a simple command that can be triggered anywhere
-		this.addCommand({
-			id: 'open-modal-simple',
-			name: 'Open modal (simple)',
-			callback: () => {
-				new SampleModal(this.app).open();
-			},
-		});
-		// This adds an editor command that can perform some operation on the current editor instance
-		this.addCommand({
-			id: 'replace-selected',
-			name: 'Replace selected content',
-			editorCallback: (
-				editor: Editor,
-				_ctx: MarkdownView | MarkdownFileInfo,
-			) => {
-				editor.replaceSelection('Sample editor command');
-			},
-		});
-		// This adds a complex command that can check whether the current state of the app allows execution of the command
-		this.addCommand({
-			id: 'open-modal-complex',
-			name: 'Open modal (complex)',
-			checkCallback: (checking: boolean) => {
-				// Conditions to check
-				const markdownView =
-					this.app.workspace.getActiveViewOfType(MarkdownView);
-				if (markdownView) {
-					// If checking is true, we're simply "checking" if the command can be run.
-					// If checking is false, then we want to actually perform the operation.
-					if (!checking) {
-						new SampleModal(this.app).open();
-					}
+        const fileContent = await this.app.vault.read(file);
+        const lines = fileContent.split('\n');
 
-					// This command will only show up in Command Palette when the check function returns true
-					return true;
-				}
-				return false;
-			},
-		});
+        const newJsonText = JSON.stringify(habits, null, 2);
 
-		// This adds a settings tab so the user can configure various aspects of the plugin
-		this.addSettingTab(new SampleSettingTab(this.app, this));
+        const updatedLines = [
+          ...lines.slice(0, section.lineStart + 1),
+          newJsonText,
+          ...lines.slice(section.lineEnd)
+        ];
 
-		// If the plugin hooks up any global DOM events (on parts of the app that doesn't belong to this plugin)
-		// Using this function will automatically remove the event listener when this plugin is disabled.
-		this.registerDomEvent(activeDocument, 'click', (_evt: MouseEvent) => {
-			new Notice('Click');
-		});
+        await this.app.vault.modify(file, updatedLines.join('\n'));
+    }
 
-		// When registering intervals, this function will automatically clear the interval when the plugin is disabled.
-		this.registerInterval(
-			window.setInterval(() => console.log('setInterval'), 5 * 60 * 1000),
-		);
-	}
-
-	onunload() {}
-
-	async loadSettings() {
-		this.settings = Object.assign(
-			{},
-			DEFAULT_SETTINGS,
-			(await this.loadData()) as Partial<MyPluginSettings>,
-		);
-	}
-
-	async saveSettings() {
-		await this.saveData(this.settings);
-	}
-}
-
-class SampleModal extends Modal {
-	onOpen() {
-		const { contentEl } = this;
-		contentEl.setText('Woah!');
-	}
-
-	onClose() {
-		const { contentEl } = this;
-		contentEl.empty();
-	}
+      const child = new ReactWidgetChild(container, updateHabits, getHabits);
+      ctx.addChild(child);
+    });
+  }
 }
