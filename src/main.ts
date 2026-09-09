@@ -11,7 +11,7 @@ export default class ExamplePlugin extends Plugin {
 
 				const getHabits = (): HabitData[] => {
 					try {
-					if (!source.trim()) {
+						if (!source.trim()) {
 							return [];
 						}
 
@@ -38,10 +38,12 @@ export default class ExamplePlugin extends Plugin {
 					const lines = fileContent.split('\n');
 
 					const newJsonText = JSON.stringify(habits, null, 2);
-					const currentBlockContent = lines.slice(section.lineStart + 1, section.lineEnd).join('\n');
+					const currentBlockContent = lines
+						.slice(section.lineStart + 1, section.lineEnd)
+						.join('\n');
 
 					if (currentBlockContent.trim() === newJsonText.trim()) {
-						return; 
+						return;
 					}
 
 					const updatedLines = [

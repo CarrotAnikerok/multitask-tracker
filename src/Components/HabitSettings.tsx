@@ -48,7 +48,7 @@ export default function HabitSettings({
 
 	const changeColor = (event: React.ChangeEvent<HTMLInputElement>) => {
 		setColor(event.target.value);
-	}
+	};
 
 	return (
 		<form className="settings" onSubmit={handleSubmit}>
@@ -61,7 +61,7 @@ export default function HabitSettings({
 					className={nameError ? 'error' : ''}
 				></input>
 				<label htmlFor="color">Цвет</label>
-				<div className='color-container'>
+				<div className="color-container">
 					<input
 						name="color"
 						type="text"
@@ -69,7 +69,10 @@ export default function HabitSettings({
 						value={color}
 						onChange={changeColor}
 					></input>
-					<span className='color-ball' style={{backgroundColor: color}}></span>
+					<span
+						className="color-ball"
+						style={{ backgroundColor: color }}
+					></span>
 				</div>
 				<label htmlFor="maxSize">Размер</label>
 				<input
