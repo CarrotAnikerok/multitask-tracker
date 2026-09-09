@@ -38,10 +38,17 @@ export default class ExamplePlugin extends Plugin {
 					const lines = fileContent.split('\n');
 
 					const newJsonText = JSON.stringify(habits, null, 2);
+					const currentBlockContent = lines.slice(section.lineStart + 1, section.lineEnd).join('\n');
+
+					if (currentBlockContent.trim() === newJsonText.trim()) {
+						return; 
+					}
 
 					const updatedLines = [
-						...lines.slice(0, section.lineStart + 1),
+						...lines.slice(0, section.lineStart),
+						'```multitask',
 						newJsonText,
+						'```',
 						...lines.slice(section.lineEnd + 1),
 					];
 
