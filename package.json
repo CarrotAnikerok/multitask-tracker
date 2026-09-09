@@ -8,7 +8,9 @@
 		"dev": "node esbuild.config.mjs",
 		"build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
 		"version": "node version-bump.mjs && git add manifest.json versions.json",
-		"lint": "eslint ."
+		"lint": "eslint .",
+		"format:fix": "prettier --write .",
+		"prepare": "husky"
 	},
 	"keywords": [],
 	"license": "0-BSD",
@@ -21,8 +23,10 @@
 		"eslint": "^9.39.4",
 		"eslint-plugin-obsidianmd": "^0.4.0",
 		"globals": "^17.6.0",
+		"husky": "^9.1.7",
 		"jiti": "^2.6.1",
 		"obsidian": "latest",
+		"prettier": "^3.9.6",
 		"typescript": "^5.8.3",
 		"typescript-eslint": "^8.59.1"
 	},
