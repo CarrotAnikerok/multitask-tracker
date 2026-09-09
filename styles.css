@@ -1,137 +1,137 @@
 .container {
-    display: grid;
-    height: 190px;
-    grid-template-rows: 1fr 1fr 5fr 2fr;
-    grid-auto-columns: 70px;
-    background-color: var(--background-primary);
-    color: var(--text-normal);
-    grid-auto-flow: column;
-    place-items: end center;
-    text-align: center;
-    overflow-x: auto;
-    user-select: none;
-    touch-action: none;
-    overflow: hidden;
+	display: grid;
+	height: 190px;
+	grid-template-rows: 1fr 1fr 5fr 2fr;
+	grid-auto-columns: 70px;
+	background-color: var(--background-primary);
+	color: var(--text-normal);
+	grid-auto-flow: column;
+	place-items: end center;
+	text-align: center;
+	overflow-x: auto;
+	user-select: none;
+	touch-action: none;
+	overflow: hidden;
 }
 
 .custom-button {
-    border-radius: 50%;
-    height: 20px;
-    padding: 7px;
+	border-radius: 50%;
+	height: 20px;
+	padding: 7px;
 }
 
 .setting-buttons {
-    grid-row: 1 / 5;
-    place-self: center;
-    font-family: var(--font-monospace-default);
-    display: flex;
-    flex-direction: column;
-    gap: 0.5em;
+	grid-row: 1 / 5;
+	place-self: center;
+	font-family: var(--font-monospace-default);
+	display: flex;
+	flex-direction: column;
+	gap: 0.5em;
 }
 
 .habit-container {
-    display: contents;
-    font-family: var(--font-monospace-default);
+	display: contents;
+	font-family: var(--font-monospace-default);
 }
 
 .name {
-    font-size: 0.8em;
-    place-self: center center;
-    word-break: break-all;
+	font-size: 0.8em;
+	place-self: center center;
+	word-break: break-all;
 }
 
 .size-buttons {
-    place-self: start center;
-    display: flex;
-    gap: 2px;
+	place-self: start center;
+	display: flex;
+	gap: 2px;
 }
 
 .habit {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    font-size: var(--font-smaller);
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	font-size: var(--font-smaller);
 }
 
 .habit-block {
-    background-color:aquamarine;
-    width: 20px;
-    height: 64px;
-    border-radius: 4px;
+	background-color: aquamarine;
+	width: 20px;
+	height: 64px;
+	border-radius: 4px;
 }
 
 .settings {
-    grid-row: span 4;
-    grid-column: span 3;
-    place-self: center;
-    background-color: var(--background-primary-alt);
+	grid-row: span 4;
+	grid-column: span 3;
+	place-self: center;
+	background-color: var(--background-primary-alt);
 
-    display: flex;
-    gap: 5px;
-    flex-direction: column;
-    font-size: var(--font-ui-smaller);
-    padding: 15px;
-    border-radius: var(--radius-s);
+	display: flex;
+	gap: 5px;
+	flex-direction: column;
+	font-size: var(--font-ui-smaller);
+	padding: 15px;
+	border-radius: var(--radius-s);
 }
 
 .settings > *:nth-child(3n - 2) {
-  place-self: center;
-  place-items: center start;
-  text-align: start;
+	place-self: center;
+	place-items: center start;
+	text-align: start;
 }
 
 .form-fields {
-    display: grid;
-    grid-template-columns: 1fr 2fr;
-    gap: 8px 4px;
-    padding-bottom: 5px;
+	display: grid;
+	grid-template-columns: 1fr 2fr;
+	gap: 8px 4px;
+	padding-bottom: 5px;
 }
 
 .form-fields .error {
-    border: 1px solid red;
+	border: 1px solid red;
 }
 
 input {
-    height: 10px;
-    width: 80px;
+	height: 10px;
+	width: 80px;
 }
 
 /*Floating panels*/
 
 .panel-trigger {
-    border: none;
-    padding: 10px;
-    border-radius: 4px;
+	border: none;
+	padding: 10px;
+	border-radius: 4px;
 }
 
 .habit-setting-button > button {
-    font-size: 0.5em;
-    padding: 0;
-    width: 3em;
-    height: 2em;
-    place-self: center center;
+	font-size: 0.5em;
+	padding: 0;
+	width: 3em;
+	height: 2em;
+	place-self: center center;
 }
 
 .floating-panel {
-    position: absolute;
-    height: 3em;
-    width: 7em;
+	position: absolute;
+	height: 3em;
+	width: 7em;
 }
 
 .edit-panel-buttons button {
-    box-shadow: none;
-    width: 8em;
-    height: 2em;
-    margin: 0;
-    border-radius: 0;
+	box-shadow: none;
+	width: 8em;
+	height: 2em;
+	margin: 0;
+	border-radius: 0;
 }
 
 .sort-panel {
-    display: flex;
-    gap: 1em;
-    background-color: var(--background-primary-alt);
-    font-size: var(--font-ui-smaller);
-    width: fit-content;
-    padding: 1em;
-    border-radius: 4px;
+	display: flex;
+	gap: 1em;
+	background-color: var(--background-primary-alt);
+	font-size: var(--font-ui-smaller);
+	width: fit-content;
+	padding: 1em;
+	border-radius: 4px;
 }
