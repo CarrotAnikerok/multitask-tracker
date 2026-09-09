@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { Habit } from '../../Models/Habit';
 import FloatingPanel from './FloatingPanel';
 

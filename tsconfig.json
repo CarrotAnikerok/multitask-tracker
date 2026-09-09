@@ -1,6 +1,7 @@
 {
 	"compilerOptions": {
 		"jsx": "react-jsx",
+		"jsxImportSource": "react",
 		"inlineSourceMap": true,
 		"inlineSources": true,
 		"module": "ESNext",
@@ -10,6 +11,7 @@
 		"noFallthroughCasesInSwitch": true,
 		"noUncheckedIndexedAccess": true,
 		"isolatedModules": true,
+		"moduleResolution": "node",
 		"skipLibCheck": true,
 		"forceConsistentCasingInFileNames": true,
 		"allowSyntheticDefaultImports": true,
