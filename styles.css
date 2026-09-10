@@ -97,13 +97,6 @@
 	align-items: center;
 }
 
-.color-ball {
-	display: block;
-	width: 1em;
-	height: 1em;
-	border-radius: 10px;
-}
-
 input {
 	height: 10px;
 	width: 80px;

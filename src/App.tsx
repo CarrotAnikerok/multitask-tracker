@@ -49,6 +49,7 @@ export const App = ({ initialHabits, onChange }: AppProps) => {
 		<div>
 			<div className="container" ref={containerRef}>
 				{isHabitCreation ? (
+					
 					<HabitSettings
 						onClose={() => setHabitCreation(false)}
 						updateOrCreate={updateHabits}

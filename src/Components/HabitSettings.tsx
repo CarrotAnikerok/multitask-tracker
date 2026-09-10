@@ -13,7 +13,7 @@ export default function HabitSettings({
 	existingHabit,
 }: SettingsProps) {
 	const [nameError, setNameError] = React.useState(false);
-	const [color, setColor] = React.useState('');
+	const [color, setColor] = React.useState(existingHabit?.color || '');
 
 	const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
 		e.preventDefault();
@@ -64,15 +64,11 @@ export default function HabitSettings({
 				<div className="color-container">
 					<input
 						name="color"
-						type="text"
-						defaultValue={existingHabit?.color || ''}
+						type="color"
 						value={color}
 						onChange={changeColor}
+						style={{ 'height': '26px'}}
 					></input>
-					<span
-						className="color-ball"
-						style={{ backgroundColor: color }}
-					></span>
 				</div>
 				<label htmlFor="maxSize">Размер</label>
 				<input

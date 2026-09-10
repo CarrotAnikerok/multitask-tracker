@@ -21,6 +21,7 @@ export default function FloatingPanel({
 
 	useEffect(() => {
 		const handleClickOutside = (event: PointerEvent) => {
+			//console.log('outside click');
 			const panelElem: HTMLElement = panelRef.current!;
 			const triggerElem: HTMLElement = triggerRef.current!;
 
