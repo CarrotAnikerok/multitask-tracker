@@ -79,6 +79,18 @@
 	place-items: center start;
 	text-align: start;
 }
+.settings button {
+	cursor: pointer;
+}
+
+.settings button:disabled {
+	cursor: default;
+}
+
+.settings button:hover:disabled {
+	background-color: var(--interactive-normal);
+	box-shadow: var(--input-shadow);
+}
 
 .form-fields {
 	display: grid;
@@ -89,6 +101,14 @@
 
 .form-fields .error {
 	border: 1px solid red;
+}
+
+.form-fields .error:hover {
+	border: 1px solid red !important;
+}
+
+.form-fields .error:focus {
+	box-shadow: 0 0 0 2px red;
 }
 
 .color-container {
@@ -140,4 +160,25 @@ input {
 	width: fit-content;
 	padding: 1em;
 	border-radius: 4px;
+}
+
+.custom-tooltip {
+	animation: pop-down 200ms forwards ease-in-out;
+	position: absolute;
+	left: 100%;
+	background-color: var(--background-modifier-message);
+	font-size: var(--font-ui-smaller);
+	padding: 5px;
+	white-space: pre;
+	margin-left: 10px;
+	border-radius: var(--radius-s);
+}
+
+@keyframes pop-down {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }

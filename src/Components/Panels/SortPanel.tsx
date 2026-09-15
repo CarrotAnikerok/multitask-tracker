@@ -17,12 +17,18 @@ export default function SortPanel({ setHabits }: SortPanelProps) {
 	const [type, setType] = useState(SortType.Size);
 	const [isIncrease, setIncrease] = useState(false);
 
-	const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+	const changeType = (event: React.ChangeEvent<HTMLSelectElement>) => {
 		const numericValue = Number(event.target.value);
 		setType(numericValue);
+		sort(numericValue, isIncrease);
 	};
 
-	const sortByPositiveUpdate = () => {
+	const changeIncrease = () => {
+		setIncrease((isIncrease) => !isIncrease);
+		sort(type, !isIncrease);
+	}
+
+	const sortByPositiveUpdate = (isIncrease: boolean) => {
 		setHabits((habits) =>
 			[...habits].sort((a, b) => {
 				const lastPositiveUpdateA =
@@ -44,7 +50,7 @@ export default function SortPanel({ setHabits }: SortPanelProps) {
 		);
 	};
 
-	const sortBySize = () => {
+	const sortBySize = (isIncrease: boolean) => {
 		setHabits((habits) =>
 			[...habits].sort((a, b) => {
 				const aCoeff = a.size / a.maxSize;
@@ -59,7 +65,7 @@ export default function SortPanel({ setHabits }: SortPanelProps) {
 		);
 	};
 
-	const sortByAlphabet = () => {
+	const sortByAlphabet = (isIncrease: boolean) => {
 		setHabits((habits) =>
 			[...habits].sort((a, b) => {
 				if (isIncrease) {
@@ -71,29 +77,29 @@ export default function SortPanel({ setHabits }: SortPanelProps) {
 		);
 	};
 
-	const sort = () => {
+	const sort = (type: SortType, isIncrease: boolean) => {
 		switch (type) {
 			case SortType.Alphabet:
-				sortByAlphabet();
+				sortByAlphabet(isIncrease);
 				break;
 			case SortType.LastUpdated:
-				sortByPositiveUpdate();
+				sortByPositiveUpdate(isIncrease);
 				break;
 			case SortType.Size:
-				sortBySize();
+				sortBySize(isIncrease);
 				break;
 			default:
-				sortBySize();
+				sortBySize(isIncrease);
 		}
-	};
+	}
 
 	return (
 		<div>
 			<FloatingPanel
-				content={(close) => (
+				content={() => (
 					<div className="sort-panel">
 						Sort by
-						<select value={type} onChange={handleChange}>
+						<select value={type} onChange={changeType}>
 							<option value={SortType.Alphabet}>
 								alphabetical
 							</option>
@@ -102,16 +108,8 @@ export default function SortPanel({ setHabits }: SortPanelProps) {
 							</option>
 							<option value={SortType.Size}>size</option>
 						</select>
-						<button onClick={() => setIncrease(!isIncrease)}>
+						<button onClick={changeIncrease}>
 							{isIncrease ? '↑' : '↓'}
-						</button>
-						<button
-							onClick={() => {
-								sort();
-								close();
-							}}
-						>
-							Ok
 						</button>
 					</div>
 				)}

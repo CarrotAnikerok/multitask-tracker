@@ -45,11 +45,11 @@ export const App = ({ initialHabits, onChange }: AppProps) => {
 		}
 	}, [speed]);
 
+	// может логичнее вынести кнопки за грид
 	return (
 		<div>
 			<div className="container" ref={containerRef}>
 				{isHabitCreation ? (
-					
 					<HabitSettings
 						onClose={() => setHabitCreation(false)}
 						updateOrCreate={updateHabits}

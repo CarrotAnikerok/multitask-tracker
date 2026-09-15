@@ -21,7 +21,10 @@ export function usePointerSpeed(
 		const dragStart = (ev: PointerEvent) => {
 			//console.log('drag start');
 			const target = ev.target as HTMLElement;
-			if (target && (target.closest('button') || target.closest('input'))) {
+			if (
+				target &&
+				(target.closest('button') || target.closest('input'))
+			) {
 				return;
 			}
 

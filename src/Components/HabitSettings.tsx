@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { Habit } from '../Models/Habit';
+import Tooltip from './Tooltip';
 
 type SettingsProps = {
 	onClose: () => void;
@@ -12,74 +13,84 @@ export default function HabitSettings({
 	updateOrCreate,
 	existingHabit,
 }: SettingsProps) {
-	const [nameError, setNameError] = React.useState(false);
-	const [color, setColor] = React.useState(existingHabit?.color || '');
+	const [name, setName] = React.useState(existingHabit?.name || '');
+	const [size, setSize] = React.useState(existingHabit?.size || '');
+	// TODO: random color
+	const [color, setColor] = React.useState(existingHabit?.color || '#ffffff');
+	let nameError: boolean = false;
+	let sizeError: boolean = false;
+
+	if (name.length > 18) {
+		nameError = true;
+	} else {
+		nameError = false;
+	}
+
+	const sizeNumber = Number(size);
+	if (Number.isNaN(sizeNumber) || sizeNumber < 0 || sizeNumber > 150) {
+		sizeError = true;
+	} else {
+		sizeError = false;
+	}
 
 	const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
 		e.preventDefault();
 
-		const form = e.target;
-		const formData = new FormData(form);
-
-		const name = (formData.get('name') as string) || 'New habit'; //should be 9 or less string
-
-		if (name.length > 18) {
-			setNameError(true);
-			return;
-		} else {
-			setNameError(false);
-		}
-
-		const color = (formData.get('color') as string) || 'white';
-		const maxSize = Number(formData.get('maxSize')) || 5;
+		const maxSize = Number(size) || 5;
+		const finalName = name || 'New habit';
 
 		//TODO: need to rewrite to method
 		if (existingHabit) {
-			existingHabit.name = name;
+			existingHabit.name = finalName;
 			existingHabit.color = color;
 			existingHabit.maxSize = maxSize;
 			updateOrCreate(existingHabit);
 		} else {
-			const newHabit = new Habit(name, maxSize, color);
+			const newHabit = new Habit(finalName, maxSize, color);
 			updateOrCreate(newHabit);
 		}
 		onClose();
 	};
 
-	const changeColor = (event: React.ChangeEvent<HTMLInputElement>) => {
-		setColor(event.target.value);
-	};
-
 	return (
 		<form className="settings" onSubmit={handleSubmit}>
 			<div className="form-fields">
-				<label htmlFor="name">Имя (18)</label>
-				<input
-					name="name"
-					type="text"
-					defaultValue={existingHabit?.name || ''}
-					className={nameError ? 'error' : ''}
-				></input>
+				<label htmlFor="name">Имя</label>
+				<div style={{position: 'relative'}}>
+					<input
+						name="name"
+						type="text"
+						className={nameError ? 'error' : ''}
+						value={name}
+						onChange={(e) => setName(e.target.value)}
+					></input>
+					{nameError ?<Tooltip>Должно быть меньше 18 символов</Tooltip> : null}
+				</div>
 				<label htmlFor="color">Цвет</label>
 				<div className="color-container">
 					<input
 						name="color"
 						type="color"
 						value={color}
-						onChange={changeColor}
-						style={{ 'height': '26px'}}
+						onChange={(e) => setColor(e.target.value)}
+						style={{ height: '26px' }}
 					></input>
 				</div>
 				<label htmlFor="maxSize">Размер</label>
-				<input
-					name="maxSize"
-					type="text"
-					defaultValue={existingHabit?.size || ''}
-				></input>
+				<div style={{position: 'relative'}}>
+					<input
+						name="maxSize"
+						type="text"
+						className={sizeError ? 'error' : ''}
+						value={size}
+						onChange={(e) => setSize(e.target.value)}
+					></input>
+					{sizeError ?<Tooltip>Должно быть числом меньше 150</Tooltip> : null}
+				</div>
 			</div>
 			<div style={{ display: 'flex', gap: '5px' }}>
 				<button onClick={() => onClose()}>Cancel</button>
-				<button type="submit">
+				<button type="submit" disabled={nameError || sizeError}>
 					{existingHabit ? 'Update' : 'Create'}
 				</button>
 			</div>

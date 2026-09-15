@@ -49,20 +49,23 @@ export default class ExamplePlugin extends Plugin {
 					const updatedLines = [
 						...lines.slice(0, section.lineStart),
 						'```multitask',
-						newJsonText,
+						newJsonText.trim(),
 						'```',
 						...lines.slice(section.lineEnd + 1),
 					];
 
+
 					await this.app.vault.modify(file, updatedLines.join('\n'));
 				};
 
+
 				const child = new ReactWidgetChild(
-					container,
-					updateHabits,
-					getHabits
-				);
-				ctx.addChild(child);
+						container,
+						updateHabits,
+						getHabits,
+						this
+					);
+					ctx.addChild(child);
 			}
 		);
 	}

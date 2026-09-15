@@ -2,6 +2,7 @@ import { MarkdownRenderChild } from 'obsidian';
 import { createRoot, Root } from 'react-dom/client';
 import { App } from './App';
 import { Habit, HabitData } from './Models/Habit';
+import ExamplePlugin from './main';
 
 export class ReactWidgetChild extends MarkdownRenderChild {
 	private root: Root | null = null;
@@ -12,7 +13,8 @@ export class ReactWidgetChild extends MarkdownRenderChild {
 	constructor(
 		containerEl: HTMLElement,
 		onSaveData: (habits: Habit[]) => Promise<void>,
-		onLoadData: () => HabitData[]
+		onLoadData: () => HabitData[],
+		plugin: ExamplePlugin
 	) {
 		super(containerEl);
 		this.onSaveData = onSaveData;
@@ -39,18 +41,22 @@ export class ReactWidgetChild extends MarkdownRenderChild {
 	}
 
 	onload() {
-		const handleHabitsChange = (updatedHabits: Habit[]) => {
-			this.initialHabits = updatedHabits;
-		};
+		// artificial slowdown, because onunload cannot be async, but with reload onunload SHOULD end before onload starts. 
+		// but because its different instances we cannot track when onunload is over to start onload. so slowdown for now it is.
+		window.setTimeout(() => {
+			const handleHabitsChange = (updatedHabits: Habit[]) => {
+				this.initialHabits = updatedHabits;
+			};
 
-		this.loadHabits();
-		this.root = createRoot(this.containerEl);
-		this.root.render(
-			<App
-				onChange={handleHabitsChange}
-				initialHabits={this.initialHabits || []}
-			/>
-		);
+			this.loadHabits();
+			this.root = createRoot(this.containerEl);
+			this.root.render(
+				<App
+					onChange={handleHabitsChange}
+					initialHabits={this.initialHabits || []}
+				/>
+			);
+		}, 100);
 	}
 
 	onunload() {
