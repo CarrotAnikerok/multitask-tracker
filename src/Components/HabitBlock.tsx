@@ -19,7 +19,7 @@ export default function HabitBlock({
 	const [isEdit, setEditing] = React.useState(false);
 
 	const maxSize = habit.maxSize;
-	const pixelSize = 80;
+	const pixelSize = 5;
 
 	const changeSize = (addedSize: number) => {
 		// немного странно, переделать наверное
@@ -53,7 +53,7 @@ export default function HabitBlock({
 						<div
 							className="habit-block"
 							style={{
-								height: `${habitHeight === 0 ? 2 : habitHeight}px`,
+								height: `${habitHeight === 0 ? 0.1 : habitHeight}em`,
 								backgroundColor: habit.color,
 							}}
 						></div>

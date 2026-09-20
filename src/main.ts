@@ -54,18 +54,16 @@ export default class ExamplePlugin extends Plugin {
 						...lines.slice(section.lineEnd + 1),
 					];
 
-
 					await this.app.vault.modify(file, updatedLines.join('\n'));
 				};
 
-
 				const child = new ReactWidgetChild(
-						container,
-						updateHabits,
-						getHabits,
-						this
-					);
-					ctx.addChild(child);
+					container,
+					updateHabits,
+					getHabits,
+					this
+				);
+				ctx.addChild(child);
 			}
 		);
 	}

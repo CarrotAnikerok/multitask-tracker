@@ -41,7 +41,7 @@ export class ReactWidgetChild extends MarkdownRenderChild {
 	}
 
 	onload() {
-		// artificial slowdown, because onunload cannot be async, but with reload onunload SHOULD end before onload starts. 
+		// artificial slowdown, because onunload cannot be async, but with reload onunload SHOULD end before onload starts.
 		// but because its different instances we cannot track when onunload is over to start onload. so slowdown for now it is.
 		window.setTimeout(() => {
 			const handleHabitsChange = (updatedHabits: Habit[]) => {

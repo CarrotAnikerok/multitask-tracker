@@ -1,8 +1,8 @@
 .container {
 	display: grid;
-	height: 190px;
+	height: 11em;
 	grid-template-rows: 1fr 1fr 5fr 2fr;
-	grid-auto-columns: 70px;
+	grid-auto-columns: 4em;
 	background-color: var(--background-primary);
 	color: var(--text-normal);
 	grid-auto-flow: column;
@@ -35,7 +35,7 @@
 }
 
 .name {
-	font-size: 0.8em;
+	font-size: 0.7em;
 	place-self: center center;
 	word-break: break-all;
 }
@@ -55,8 +55,8 @@
 
 .habit-block {
 	background-color: aquamarine;
-	width: 20px;
-	height: 64px;
+	width: 1.25em;
+	height: 4em;
 	border-radius: 4px;
 }
 
@@ -118,8 +118,8 @@
 }
 
 input {
-	height: 10px;
-	width: 80px;
+	height: 0.625em;
+	width: 5em;
 }
 
 /*Floating panels*/
@@ -170,15 +170,15 @@ input {
 	font-size: var(--font-ui-smaller);
 	padding: 5px;
 	white-space: pre;
-	margin-left: 10px;
+	margin-left: 0.625em;
 	border-radius: var(--radius-s);
 }
 
 @keyframes pop-down {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
+	0% {
+		opacity: 0;
+	}
+	100% {
+		opacity: 1;
+	}
 }

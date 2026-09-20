@@ -26,7 +26,7 @@ export default function SortPanel({ setHabits }: SortPanelProps) {
 	const changeIncrease = () => {
 		setIncrease((isIncrease) => !isIncrease);
 		sort(type, !isIncrease);
-	}
+	};
 
 	const sortByPositiveUpdate = (isIncrease: boolean) => {
 		setHabits((habits) =>
@@ -91,7 +91,7 @@ export default function SortPanel({ setHabits }: SortPanelProps) {
 			default:
 				sortBySize(isIncrease);
 		}
-	}
+	};
 
 	return (
 		<div>

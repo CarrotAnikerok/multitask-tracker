@@ -56,7 +56,7 @@ export default function HabitSettings({
 		<form className="settings" onSubmit={handleSubmit}>
 			<div className="form-fields">
 				<label htmlFor="name">Имя</label>
-				<div style={{position: 'relative'}}>
+				<div style={{ position: 'relative' }}>
 					<input
 						name="name"
 						type="text"
@@ -64,7 +64,9 @@ export default function HabitSettings({
 						value={name}
 						onChange={(e) => setName(e.target.value)}
 					></input>
-					{nameError ?<Tooltip>Должно быть меньше 18 символов</Tooltip> : null}
+					{nameError ? (
+						<Tooltip>Должно быть меньше 18 символов</Tooltip>
+					) : null}
 				</div>
 				<label htmlFor="color">Цвет</label>
 				<div className="color-container">
@@ -77,7 +79,7 @@ export default function HabitSettings({
 					></input>
 				</div>
 				<label htmlFor="maxSize">Размер</label>
-				<div style={{position: 'relative'}}>
+				<div style={{ position: 'relative' }}>
 					<input
 						name="maxSize"
 						type="text"
@@ -85,7 +87,9 @@ export default function HabitSettings({
 						value={size}
 						onChange={(e) => setSize(e.target.value)}
 					></input>
-					{sizeError ?<Tooltip>Должно быть числом меньше 150</Tooltip> : null}
+					{sizeError ? (
+						<Tooltip>Должно быть числом меньше 150</Tooltip>
+					) : null}
 				</div>
 			</div>
 			<div style={{ display: 'flex', gap: '5px' }}>
