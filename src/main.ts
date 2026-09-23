@@ -1,5 +1,5 @@
 import { Plugin } from 'obsidian';
-import { Habit, HabitData } from './Models/Habit';
+import { Habit, RawHabitData } from './Models/Habit';
 import { ReactWidgetChild } from './ReactWidgetChild';
 
 export default class ExamplePlugin extends Plugin {
@@ -9,23 +9,23 @@ export default class ExamplePlugin extends Plugin {
 			(source, el, ctx) => {
 				const container = el.createDiv();
 
-				const getHabits = (): HabitData[] => {
+				const getHabits = (): RawHabitData[] => {
 					try {
 						if (!source.trim()) {
 							return [];
 						}
 
-						return JSON.parse(source) as HabitData[];
+						return JSON.parse(source) as RawHabitData[];
 					} catch (e) {
 						console.error(
-							'Ошибка парсинга JSON в код-блоке multitask:',
+							'Parsing error JSON in multitask code-block:',
 							e
 						);
 						return [];
 					}
 				};
 
-				const updateHabits = async (habits: Habit[]) => {
+				const saveHabits = async (habits: Habit[]) => {
 					const section = ctx.getSectionInfo(el);
 					if (!section) {
 						return;
@@ -59,9 +59,8 @@ export default class ExamplePlugin extends Plugin {
 
 				const child = new ReactWidgetChild(
 					container,
-					updateHabits,
-					getHabits,
-					this
+					saveHabits,
+					getHabits
 				);
 				ctx.addChild(child);
 			}

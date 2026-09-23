@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Habit } from '../Models/Habit';
 import Tooltip from './Tooltip';
+import { getRandomColor } from '../utils/utils';
 
 type SettingsProps = {
 	onClose: () => void;
@@ -15,8 +16,9 @@ export default function HabitSettings({
 }: SettingsProps) {
 	const [name, setName] = React.useState(existingHabit?.name || '');
 	const [size, setSize] = React.useState(existingHabit?.size || '');
-	// TODO: random color
-	const [color, setColor] = React.useState(existingHabit?.color || '#ffffff');
+	const [color, setColor] = React.useState(
+		existingHabit?.color || getRandomColor()
+	);
 	let nameError: boolean = false;
 	let sizeError: boolean = false;
 
@@ -39,11 +41,8 @@ export default function HabitSettings({
 		const maxSize = Number(size) || 5;
 		const finalName = name || 'New habit';
 
-		//TODO: need to rewrite to method
 		if (existingHabit) {
-			existingHabit.name = finalName;
-			existingHabit.color = color;
-			existingHabit.maxSize = maxSize;
+			existingHabit.updateSettings({ name: finalName, color, maxSize });
 			updateOrCreate(existingHabit);
 		} else {
 			const newHabit = new Habit(finalName, maxSize, color);
@@ -65,7 +64,7 @@ export default function HabitSettings({
 						onChange={(e) => setName(e.target.value)}
 					></input>
 					{nameError ? (
-						<Tooltip>Должно быть меньше 18 символов</Tooltip>
+						<Tooltip>Should be less than 18 symbols</Tooltip>
 					) : null}
 				</div>
 				<label htmlFor="color">Цвет</label>
@@ -88,7 +87,7 @@ export default function HabitSettings({
 						onChange={(e) => setSize(e.target.value)}
 					></input>
 					{sizeError ? (
-						<Tooltip>Должно быть числом меньше 150</Tooltip>
+						<Tooltip>Should be less than 150</Tooltip>
 					) : null}
 				</div>
 			</div>

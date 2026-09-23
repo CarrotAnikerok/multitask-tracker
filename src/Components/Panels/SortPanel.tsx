@@ -31,19 +31,17 @@ export default function SortPanel({ setHabits }: SortPanelProps) {
 	const sortByPositiveUpdate = (isIncrease: boolean) => {
 		setHabits((habits) =>
 			[...habits].sort((a, b) => {
-				const lastPositiveUpdateA =
-					a.positiveUpdates[a.positiveUpdates.length - 1]!;
-				const lastPositiveUpdateB =
-					b.positiveUpdates[b.positiveUpdates.length - 1]!;
+				const lastPositiveUpdateA = a.getLastPositiveUpdate();
+				const lastPositiveUpdateB = b.getLastPositiveUpdate();
 				if (isIncrease) {
 					return (
-						lastPositiveUpdateA?.getTime() -
+						lastPositiveUpdateA.getTime() -
 						lastPositiveUpdateB.getTime()
 					);
 				} else {
 					return (
 						lastPositiveUpdateB.getTime() -
-						lastPositiveUpdateA?.getTime()
+						lastPositiveUpdateA.getTime()
 					);
 				}
 			})
@@ -53,13 +51,13 @@ export default function SortPanel({ setHabits }: SortPanelProps) {
 	const sortBySize = (isIncrease: boolean) => {
 		setHabits((habits) =>
 			[...habits].sort((a, b) => {
-				const aCoeff = a.size / a.maxSize;
-				const bCoeff = b.size / b.maxSize;
+				const aCoefficient = a.size / a.maxSize;
+				const bCoefficient = b.size / b.maxSize;
 
 				if (isIncrease) {
-					return aCoeff - bCoeff;
+					return aCoefficient - bCoefficient;
 				} else {
-					return bCoeff - aCoeff;
+					return bCoefficient - aCoefficient;
 				}
 			})
 		);

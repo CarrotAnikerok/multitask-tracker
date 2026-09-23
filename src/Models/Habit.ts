@@ -1,4 +1,8 @@
-export type HabitData = {
+import { generateCode } from '../utils/utils';
+
+const DAY_MS = 24 * 3600 * 1000;
+
+export type RawHabitData = {
 	id: string;
 	name: string;
 	maxSize: number;
@@ -8,27 +12,16 @@ export type HabitData = {
 	lastUpdate: string;
 };
 
-export interface IHabit {
-	name: string;
-	size: number;
-	maxSize: number;
-	color: string;
-	positiveUpdates: Date[];
-}
-
-export class Habit implements IHabit {
+export class Habit {
 	readonly id: string;
 	name: string;
 	color: string;
-	// возможно стоит закрыть но чтоб без багов...
+
 	size: number = 10;
 	maxSize: number = 10;
+	private _positiveUpdates: Date[];
+	private _lastUpdate: Date;
 
-	// i need days, not dates... but for sorting i need dates... hm i need to replace the last date if it the same day
-	positiveUpdates: Date[];
-	private lastUpdate: Date;
-
-	// может все-таки не воссоздавать объекты... а как-то по другому...
 	constructor(
 		name: string,
 		maxSize: number,
@@ -39,14 +32,43 @@ export class Habit implements IHabit {
 		lastUpdate?: string
 	) {
 		this.name = name;
-		this.size = size ? size : maxSize;
+		this.size = size || size === 0 ? size : maxSize;
 		this.color = color;
 		this.maxSize = maxSize;
-		this.id = id ? id : this.generateCode();
-		this.positiveUpdates = positiveDates
+		this.id = id ? id : generateCode();
+		this._positiveUpdates = positiveDates
 			? positiveDates.map((d) => new Date(d))
 			: [new Date()];
-		this.lastUpdate = lastUpdate ? new Date(lastUpdate) : new Date();
+		this._lastUpdate = lastUpdate ? new Date(lastUpdate) : new Date();
+	}
+
+	static fromRaw(raw: RawHabitData): Habit {
+		return new Habit(
+			raw.name,
+			raw.maxSize,
+			raw.color,
+			raw.size,
+			raw.id,
+			raw.positiveUpdates,
+			raw.lastUpdate
+		);
+	}
+
+	getLastPositiveUpdate(): Date {
+		const lastIndex = this._positiveUpdates.length - 1;
+		const lastPositiveUpdate = this._positiveUpdates[lastIndex];
+
+		if (!lastPositiveUpdate) {
+			throw new Error('There is no last positive update');
+		}
+
+		return lastPositiveUpdate;
+	}
+
+	updateSettings(settings: Pick<Habit, 'name' | 'color' | 'maxSize'>) {
+		this.name = settings.name;
+		this.color = settings.color;
+		this.maxSize = settings.maxSize;
 	}
 
 	changeSize(addedSize: number) {
@@ -58,27 +80,25 @@ export class Habit implements IHabit {
 		}
 
 		if (newSize > this.size) {
-			const lastPositiveUpdate =
-				this.positiveUpdates[this.positiveUpdates.length - 1]!;
+			const lastPositiveUpdate = this.getLastPositiveUpdate();
 			const date = new Date();
 			if (lastPositiveUpdate.getDate() === date.getDate()) {
-				this.positiveUpdates[this.positiveUpdates.length - 1] = date;
+				this._positiveUpdates[this._positiveUpdates.length - 1] = date;
 			} else {
-				this.positiveUpdates.push(date);
+				this._positiveUpdates.push(date);
 			}
-			this.lastUpdate = date;
+			this._lastUpdate = date;
 		}
 
 		this.size = newSize;
 	}
 
-	// это бы тестами покрыть емае...
+	// TODO: add tests
 	// TODO: можно будет добавить анимации для уменьшения полосочек только при заходе чтобы понять что упало
 	decreaseSizeDated(today: Date) {
-		const DAY_MS = 24 * 3600 * 1000;
-		const daysFromLastCheck = this.getDaysBetween(this.lastUpdate, today);
+		const daysFromLastCheck = this.getDaysBetween(this._lastUpdate, today);
 		const lastPositiveUpdate: Date =
-			this.positiveUpdates[this.positiveUpdates.length - 1]!;
+			this._positiveUpdates[this._positiveUpdates.length - 1]!;
 		const lastPositiveUpdateDay = new Date(lastPositiveUpdate);
 		lastPositiveUpdateDay.setHours(0, 0, 0, 0);
 
@@ -92,33 +112,20 @@ export class Habit implements IHabit {
 			);
 			let resultSize = this.size;
 
-			// имеет ли это смысл...
+			// does this make sense?
 			if (daysFromLastCheck === daysBetweenPositive) {
 				resultSize = this.size - (daysFromLastCheck - 1);
 			} else {
 				resultSize = this.size - daysFromLastCheck;
 			}
 
-			this.lastUpdate = today;
+			this._lastUpdate = today;
 			this.size = resultSize >= 0 ? resultSize : 0;
 		}
 	}
 
 	private getDaysBetween(earlyDate: Date, lateDate: Date) {
-		const DAY_MS = 24 * 3600 * 1000;
 		const timeBetween = lateDate.getTime() - earlyDate.getTime();
 		return Math.trunc(timeBetween / DAY_MS);
-	}
-
-	private generateCode(): string {
-		return Array.apply(0, Array(6))
-			.map(function () {
-				return (function (charset) {
-					return charset.charAt(
-						Math.floor(Math.random() * charset.length)
-					);
-				})('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
-			})
-			.join('');
 	}
 }

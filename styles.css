@@ -1,9 +1,13 @@
-.container {
+.app-container {
+	display: flex;
+	flex-direction: row;
+}
+
+.habits-container {
 	display: grid;
 	height: 11em;
-	grid-template-rows: 1fr 1fr 5fr 2fr;
+	grid-template-rows: 1fr 2.5fr 5fr 2fr;
 	grid-auto-columns: 4em;
-	background-color: var(--background-primary);
 	color: var(--text-normal);
 	grid-auto-flow: column;
 	place-items: end center;
@@ -21,7 +25,8 @@
 }
 
 .setting-buttons {
-	grid-row: 1 / 5;
+	margin-right: 0.5em;
+	margin-left: 1em;
 	place-self: center;
 	font-family: var(--font-monospace-default);
 	display: flex;
@@ -58,6 +63,7 @@
 	width: 1.25em;
 	height: 4em;
 	border-radius: 4px;
+	transition: height 200ms ease-in-out;
 }
 
 .settings {
@@ -130,6 +136,20 @@ input {
 	border-radius: 4px;
 }
 
+.floating-panel {
+	position: relative;
+	height: 0em;
+	width: 0em;
+	right: 1.3em;
+}
+
+/*TODO: change classes?*/
+.cm-preview-code-block.markdown-rendered:has(.block-language-multitask)
+	.embed-actions {
+	inset-inline-start: var(--size-2-2);
+	inset-inline-end: unset;
+}
+
 .habit-setting-button > button {
 	font-size: 0.5em;
 	padding: 0;
@@ -138,15 +158,9 @@ input {
 	place-self: center center;
 }
 
-.floating-panel {
-	position: absolute;
-	height: 3em;
-	width: 7em;
-}
-
 .edit-panel-buttons button {
 	box-shadow: none;
-	width: 8em;
+	width: 5em;
 	height: 2em;
 	margin: 0;
 	border-radius: 0;

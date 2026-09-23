@@ -19,7 +19,6 @@ export function usePointerSpeed(
 		const elem: HTMLElement = containerRef.current;
 
 		const dragStart = (ev: PointerEvent) => {
-			//console.log('drag start');
 			const target = ev.target as HTMLElement;
 			if (
 				target &&

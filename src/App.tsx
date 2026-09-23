@@ -18,6 +18,16 @@ export const App = ({ initialHabits, onChange }: AppProps) => {
 		onChange(habits);
 	}, [habits]);
 
+	const containerRef = React.useRef(null);
+	const speed: number = usePointerSpeed(containerRef);
+
+	React.useEffect(() => {
+		if (containerRef?.current) {
+			const element: HTMLElement = containerRef.current;
+			element.scrollLeft = speed;
+		}
+	}, [speed]);
+
 	const deleteHabit = (habitToDelete: Habit) => {
 		setHabits((prev) =>
 			prev.filter((habit) => habit.id !== habitToDelete.id)
@@ -35,33 +45,20 @@ export const App = ({ initialHabits, onChange }: AppProps) => {
 		}
 	};
 
-	const containerRef = React.useRef(null);
-	const speed: number = usePointerSpeed(containerRef);
-
-	React.useEffect(() => {
-		if (containerRef?.current) {
-			const element: HTMLElement = containerRef.current;
-			element.scrollLeft = speed;
-		}
-	}, [speed]);
-
-	// может логичнее вынести кнопки за грид
 	return (
-		<div>
-			<div className="container" ref={containerRef}>
-				{isHabitCreation ? (
-					<HabitSettings
-						onClose={() => setHabitCreation(false)}
-						updateOrCreate={updateHabits}
-					></HabitSettings>
-				) : (
-					<div className="setting-buttons">
-						<SortPanel setHabits={setHabits}></SortPanel>
-						<button onClick={() => setHabitCreation(true)}>
-							+
-						</button>
-					</div>
-				)}
+		<div className="app-container">
+			{isHabitCreation ? (
+				<HabitSettings
+					onClose={() => setHabitCreation(false)}
+					updateOrCreate={updateHabits}
+				></HabitSettings>
+			) : (
+				<div className="setting-buttons">
+					<SortPanel setHabits={setHabits}></SortPanel>
+					<button onClick={() => setHabitCreation(true)}>+</button>
+				</div>
+			)}
+			<div className="habits-container" ref={containerRef}>
 				{habits.map((habit) => {
 					return (
 						<HabitBlock

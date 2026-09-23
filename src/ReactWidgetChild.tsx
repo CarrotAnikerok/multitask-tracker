@@ -1,20 +1,18 @@
 import { MarkdownRenderChild } from 'obsidian';
 import { createRoot, Root } from 'react-dom/client';
 import { App } from './App';
-import { Habit, HabitData } from './Models/Habit';
-import ExamplePlugin from './main';
+import { Habit, RawHabitData } from './Models/Habit';
 
 export class ReactWidgetChild extends MarkdownRenderChild {
 	private root: Root | null = null;
 	private onSaveData: (habits: Habit[]) => Promise<void>;
-	private onLoadData: () => HabitData[];
+	private onLoadData: () => RawHabitData[];
 	private initialHabits: Habit[] | null = null;
 
 	constructor(
 		containerEl: HTMLElement,
 		onSaveData: (habits: Habit[]) => Promise<void>,
-		onLoadData: () => HabitData[],
-		plugin: ExamplePlugin
+		onLoadData: () => RawHabitData[]
 	) {
 		super(containerEl);
 		this.onSaveData = onSaveData;
@@ -25,24 +23,19 @@ export class ReactWidgetChild extends MarkdownRenderChild {
 		const loadedHabits = this.onLoadData();
 		const todayDate = new Date(new Date().setHours(0, 0, 0, 0));
 
-		this.initialHabits = loadedHabits.map((h: HabitData) => {
-			const newHabit = new Habit(
-				h.name,
-				h.maxSize,
-				h.color,
-				h.size,
-				h.id,
-				h.positiveUpdates,
-				h.lastUpdate
-			);
+		this.initialHabits = loadedHabits.map((raw: RawHabitData) => {
+			const newHabit = Habit.fromRaw(raw);
 			newHabit.decreaseSizeDated(todayDate);
+
 			return newHabit;
 		});
 	}
 
 	onload() {
-		// artificial slowdown, because onunload cannot be async, but with reload onunload SHOULD end before onload starts.
-		// but because its different instances we cannot track when onunload is over to start onload. so slowdown for now it is.
+		// artificial slowdown, because onunload cannot be async,
+		// but with reload onunload SHOULD end before onload starts.
+		// but because its different instances we cannot track when onunload is over to start onload.
+		// so slowdown for now it is.
 		window.setTimeout(() => {
 			const handleHabitsChange = (updatedHabits: Habit[]) => {
 				this.initialHabits = updatedHabits;
