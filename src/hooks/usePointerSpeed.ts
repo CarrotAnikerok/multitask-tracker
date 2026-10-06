@@ -1,87 +1,132 @@
 import * as React from 'react';
 
-export function usePointerSpeed(
+export function useScrollOffset(
 	containerRef: React.RefObject<HTMLElement | null>
 ) {
-	const [speed, setSpeed] = React.useState(0);
+	const [scrollOffset, setScrollOffset] = React.useState(0);
 
 	React.useEffect(() => {
 		let velocity = 0;
 		let startX = 0;
+		let startY = 0;
+
 		let lastX = 0;
-		let lastTime: number;
-		let scrollLeft: number;
+		let lastTime = 0;
+		let scrollLeft = 0;
+
+		let isDragging = false;
+		let isHolding = false;
 
 		if (!containerRef.current) {
 			return;
 		}
 
-		const elem: HTMLElement = containerRef.current;
+		const containerToScroll: HTMLElement = containerRef.current;
 
-		const dragStart = (ev: PointerEvent) => {
-			const target = ev.target as HTMLElement;
-			if (
-				target &&
-				(target.closest('button') || target.closest('input'))
-			) {
-				return;
-			}
+		const dragStart = (event: PointerEvent) => {
+			isDragging = false;
+			isHolding = false;
 
-			elem.setPointerCapture(ev.pointerId);
-			startX = ev.clientX;
-			scrollLeft = elem.scrollLeft;
+			if (isTargetInteractive(event)) return;
+
+			containerToScroll.setPointerCapture(event.pointerId);
+
+			startX = event.clientX;
+			startY = event.clientY;
+			scrollLeft = containerToScroll.scrollLeft;
 		};
-		const dragEnd = (ev: PointerEvent) => {
-			const target = ev.target as HTMLElement;
-			if (target && target.closest('button')) {
-				return;
-			}
-			elem.releasePointerCapture(ev.pointerId);
 
-			const inertiaFactor = 0.95;
+		const dragEnd = (event: PointerEvent) => {
+			if (isTargetInteractive(event)) return;
 
-			let animateInertia = () => {
-				if (Math.abs(velocity) > 0.1) {
-					setSpeed((speed) => speed - velocity * 10);
-					velocity *= inertiaFactor;
+			isDragging = false;
+
+			const SLOWDOWN_COEFFICIENT = 0.95;
+			const INERTIA_COEFFICIENT = 8;
+
+			(function animateInertia() {
+				const inertiaVelocity = velocity * INERTIA_COEFFICIENT;
+				if (Math.abs(inertiaVelocity) > 0.1) {
+					setScrollOffset(
+						(scrollOffset) => scrollOffset - inertiaVelocity
+					);
+					velocity *= SLOWDOWN_COEFFICIENT;
 					window.requestAnimationFrame(animateInertia);
 				}
-			};
-
-			animateInertia();
+			})();
 		};
 
-		const drag = (ev: PointerEvent) => {
-			const target = ev.target as HTMLElement;
-			if (target && target.closest('button')) {
-				return;
-			}
+		const drag = (event: PointerEvent) => {
+			if (isTargetInteractive(event) || isHolding) return;
 
-			if (elem.hasPointerCapture(ev.pointerId)) {
-				const currentTime = Date.now();
+			if (!isDragging) {
+				const DRAG_PIXEL_THRESHOLD = 5;
+				const dx = event.clientX - startX;
+				const dy = event.clientY - startY;
+				const isPointerMovedThreshold =
+					Math.sqrt(dx * dx + dy * dy) > DRAG_PIXEL_THRESHOLD;
 
-				if (lastTime) {
-					velocity = (ev.clientX - lastX) / (currentTime - lastTime);
+				if (isPointerMovedThreshold) {
+					(function emitDragging() {
+						isDragging = true;
+
+						const event = new CustomEvent('multitask:drag-started');
+						window.dispatchEvent(event);
+					})();
 				}
+			}
 
-				lastX = ev.clientX;
-				lastTime = currentTime;
+			if (
+				isDragging &&
+				containerToScroll.hasPointerCapture(event.pointerId)
+			) {
+				(function calculateInertiaValues() {
+					const currentTime = Date.now();
+					const distanceFromLastFrame = event.clientX - lastX;
 
-				const walk = (ev.clientX - startX) * 0.9;
-				setSpeed(scrollLeft - walk);
+					if (lastTime) {
+						velocity =
+							distanceFromLastFrame / (currentTime - lastTime);
+					}
+
+					lastX = event.clientX;
+					lastTime = currentTime;
+				})();
+
+				const walk = (function calculateDragWalk() {
+					const SMOOTH_COEFFICIENT = 0.9;
+					return (event.clientX - startX) * SMOOTH_COEFFICIENT;
+				})();
+
+				setScrollOffset(scrollLeft - walk);
 			}
 		};
 
-		elem.addEventListener('pointerdown', dragStart);
-		elem.addEventListener('pointerup', dragEnd);
-		elem.addEventListener('pointermove', drag);
+		const onExternalDragHold = () => {
+			isDragging = false;
+			isHolding = true;
+		};
+
+		containerToScroll.addEventListener('pointerdown', dragStart);
+		containerToScroll.addEventListener('pointerup', dragEnd);
+		containerToScroll.addEventListener('pointermove', drag);
+		window.addEventListener('multitask:hold-started', onExternalDragHold);
 
 		return () => {
-			elem.removeEventListener('pointerdown', dragStart);
-			elem.removeEventListener('pointerup', dragEnd);
-			elem.removeEventListener('pointermove', drag);
+			containerToScroll.removeEventListener('pointerdown', dragStart);
+			containerToScroll.removeEventListener('pointerup', dragEnd);
+			containerToScroll.removeEventListener('pointermove', drag);
+			window.removeEventListener(
+				'multitask:hold-started',
+				onExternalDragHold
+			);
 		};
 	}, [containerRef]);
 
-	return speed;
+	return scrollOffset;
+}
+
+function isTargetInteractive(event: PointerEvent) {
+	const target = event.target as HTMLElement;
+	return target && (target.closest('button') || target.closest('input'));
 }

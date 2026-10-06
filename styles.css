@@ -1,9 +1,10 @@
+/*MAIN*/
 .app-container {
 	display: flex;
 	flex-direction: row;
 }
 
-.habits-container {
+.cells-container {
 	display: grid;
 	height: 11em;
 	grid-template-rows: 1fr 2.5fr 5fr 2fr;
@@ -16,12 +17,7 @@
 	user-select: none;
 	touch-action: none;
 	overflow: hidden;
-}
-
-.custom-button {
-	border-radius: 50%;
-	height: 20px;
-	padding: 7px;
+	padding-inline: 2px;
 }
 
 .setting-buttons {
@@ -34,9 +30,49 @@
 	gap: 0.5em;
 }
 
-.habit-container {
-	display: contents;
+/*HABIT CELL*/
+
+.habit-cell {
+	display: grid;
+	grid-template-rows: subgrid;
+	grid-row: span 4;
+
 	font-family: var(--font-monospace-default);
+	touch-action: none;
+}
+
+.habit-setting-button > button {
+	font-size: 0.5em;
+	padding: 0;
+	width: 3em;
+	height: 2em;
+	place-self: center center;
+}
+
+.hold {
+	touch-action: none;
+	position: relative;
+}
+
+.hold::before {
+	content: '';
+	position: absolute;
+	border: 2px solid var(--color-accent);
+	border-radius: 5px;
+	top: 0;
+	bottom: 0;
+	left: -4px;
+	right: -4px;
+}
+
+.habit-setting {
+	grid-column: span 3;
+}
+
+.habit-container {
+	display: grid;
+	grid-template-rows: subgrid;
+	grid-row: span 4;
 }
 
 .name {
@@ -45,13 +81,8 @@
 	word-break: break-all;
 }
 
-.size-buttons {
-	place-self: start center;
-	display: flex;
-	gap: 2px;
-}
-
 .habit {
+	align-self: end;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
@@ -65,6 +96,20 @@
 	border-radius: 4px;
 	transition: height 200ms ease-in-out;
 }
+
+.size-buttons {
+	place-self: start center;
+	display: flex;
+	gap: 2px;
+}
+
+.custom-button {
+	border-radius: 50%;
+	height: 20px;
+	padding: 7px;
+}
+
+/*HABIT SETTING MENU*/
 
 .settings {
 	grid-row: span 4;
@@ -128,7 +173,7 @@ input {
 	width: 5em;
 }
 
-/*Floating panels*/
+/*FLOATING PANELS*/
 
 .panel-trigger {
 	border: none;
@@ -143,21 +188,6 @@ input {
 	right: 1.3em;
 }
 
-/*TODO: change classes?*/
-.cm-preview-code-block.markdown-rendered:has(.block-language-multitask)
-	.embed-actions {
-	inset-inline-start: var(--size-2-2);
-	inset-inline-end: unset;
-}
-
-.habit-setting-button > button {
-	font-size: 0.5em;
-	padding: 0;
-	width: 3em;
-	height: 2em;
-	place-self: center center;
-}
-
 .edit-panel-buttons button {
 	box-shadow: none;
 	width: 5em;
@@ -165,6 +195,8 @@ input {
 	margin: 0;
 	border-radius: 0;
 }
+
+/*OTHER*/
 
 .sort-panel {
 	display: flex;
@@ -186,6 +218,13 @@ input {
 	white-space: pre;
 	margin-left: 0.625em;
 	border-radius: var(--radius-s);
+}
+
+/*TODO: change classes?*/
+.cm-preview-code-block.markdown-rendered:has(.block-language-multitask)
+	.embed-actions {
+	inset-inline-start: var(--size-2-2);
+	inset-inline-end: unset;
 }
 
 @keyframes pop-down {

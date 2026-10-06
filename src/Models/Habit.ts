@@ -19,6 +19,7 @@ export class Habit {
 
 	size: number = 10;
 	maxSize: number = 10;
+	isAnimateDecrease: boolean = false;
 	private _positiveUpdates: Date[];
 	private _lastUpdate: Date;
 
@@ -39,6 +40,7 @@ export class Habit {
 		this._positiveUpdates = positiveDates
 			? positiveDates.map((d) => new Date(d))
 			: [new Date()];
+
 		this._lastUpdate = lastUpdate ? new Date(lastUpdate) : new Date();
 	}
 
@@ -52,6 +54,18 @@ export class Habit {
 			raw.positiveUpdates,
 			raw.lastUpdate
 		);
+	}
+
+	toRaw(): RawHabitData {
+		return {
+			id: this.id,
+			name: this.name,
+			maxSize: this.maxSize,
+			size: this.size,
+			color: this.color,
+			positiveUpdates: this._positiveUpdates.map((u) => u.toISOString()),
+			lastUpdate: this._lastUpdate.toISOString(),
+		};
 	}
 
 	getLastPositiveUpdate(): Date {
@@ -82,46 +96,73 @@ export class Habit {
 		if (newSize > this.size) {
 			const lastPositiveUpdate = this.getLastPositiveUpdate();
 			const date = new Date();
+
 			if (lastPositiveUpdate.getDate() === date.getDate()) {
 				this._positiveUpdates[this._positiveUpdates.length - 1] = date;
 			} else {
 				this._positiveUpdates.push(date);
 			}
+
 			this._lastUpdate = date;
 		}
 
 		this.size = newSize;
 	}
 
-	// TODO: add tests
-	// TODO: можно будет добавить анимации для уменьшения полосочек только при заходе чтобы понять что упало
-	decreaseSizeDated(today: Date) {
+	// этот весь функционал в отдельный класс можно
+	// в целом логики много.. странной...
+
+	decreaseDatedSize() {
+		const todayDate = new Date(new Date().setHours(0, 0, 0, 0));
+
+		if (!this.isDatedSizeDecrease(todayDate)) {
+			return;
+		}
+		const resultSize = this.calculateDecreaseSizeDated(todayDate);
+
+		this._lastUpdate = todayDate;
+		this.size = resultSize > 0 ? resultSize : 0;
+		this.isAnimateDecrease = false;
+	}
+
+	//CLEAN
+	isDatedSizeDecrease(today: Date): boolean {
 		const daysFromLastCheck = this.getDaysBetween(this._lastUpdate, today);
 		const lastPositiveUpdate: Date =
 			this._positiveUpdates[this._positiveUpdates.length - 1]!;
 		const lastPositiveUpdateDay = new Date(lastPositiveUpdate);
 		lastPositiveUpdateDay.setHours(0, 0, 0, 0);
 
-		if (
+		return (
 			daysFromLastCheck > 0 &&
 			lastPositiveUpdateDay.getTime() + DAY_MS < today.getTime()
-		) {
-			const daysBetweenPositive = this.getDaysBetween(
-				lastPositiveUpdateDay,
-				today
-			);
-			let resultSize = this.size;
+		);
+	}
 
-			// does this make sense?
-			if (daysFromLastCheck === daysBetweenPositive) {
-				resultSize = this.size - (daysFromLastCheck - 1);
-			} else {
-				resultSize = this.size - daysFromLastCheck;
-			}
+	// TODO: add tests
+	// TODO: можно будет добавить анимации для уменьшения полосочек только при заходе чтобы понять что упало
+	calculateDecreaseSizeDated(today: Date): number {
+		const daysFromLastCheck = this.getDaysBetween(this._lastUpdate, today);
+		const lastPositiveUpdate: Date =
+			this._positiveUpdates[this._positiveUpdates.length - 1]!;
+		const lastPositiveUpdateDay = new Date(lastPositiveUpdate);
+		lastPositiveUpdateDay.setHours(0, 0, 0, 0);
 
-			this._lastUpdate = today;
-			this.size = resultSize >= 0 ? resultSize : 0;
+		const daysBetweenPositive = this.getDaysBetween(
+			lastPositiveUpdateDay,
+			today
+		);
+		let resultSize = this.size;
+
+		// does this make sense?
+		if (daysFromLastCheck === daysBetweenPositive) {
+			resultSize = this.size - (daysFromLastCheck - 1);
+		} else {
+			resultSize = this.size - daysFromLastCheck;
 		}
+
+		this.isAnimateDecrease = true;
+		return resultSize;
 	}
 
 	private getDaysBetween(earlyDate: Date, lateDate: Date) {

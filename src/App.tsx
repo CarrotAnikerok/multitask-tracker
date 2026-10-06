@@ -3,30 +3,64 @@ import HabitBlock from './Components/HabitBlock';
 import HabitSettings from './Components/HabitSettings';
 import { Habit } from './Models/Habit';
 import SortPanel from './Components/Panels/SortPanel';
-import { usePointerSpeed } from './hooks/usePointerSpeed';
+import { useScrollOffset } from './hooks/usePointerSpeed';
+import { useDragAndDrop } from './hooks/useDragAndDrop';
+import { SettingData, SortType } from './Models/Settings';
 
 type AppProps = {
-	onChange: (habits: Habit[]) => void;
+	onChangeHabits: (habits: Habit[]) => void;
+	onChangeSettings: (setting: SettingData) => void;
 	initialHabits: Habit[];
+	initialSettings: SettingData;
 };
 
-export const App = ({ initialHabits, onChange }: AppProps) => {
+export const App = ({
+	initialHabits,
+	onChangeHabits,
+	onChangeSettings,
+	initialSettings,
+}: AppProps) => {
 	const [habits, setHabits] = React.useState<Habit[]>(initialHabits);
 	const [isHabitCreation, setHabitCreation] = React.useState(false);
 
+	//TODO: move to other component?
+	const [customOrder, setCustomOrder] = React.useState(
+		initialSettings.customOrder
+	);
+	const [sortType, setSortType] = React.useState(initialSettings.sortType);
+	const [isIncrease, setIncrease] = React.useState(
+		initialSettings.isIncrease
+	);
+
+	const changeOrder = (newIdsOrder: string[]) => {
+		setCustomOrder(newIdsOrder);
+		setSortType(SortType.Custom);
+		setHabits((prev) => {
+			const habitMap = new Map(prev.map((h) => [h.id, h]));
+			return newIdsOrder
+				.map((id) => habitMap.get(id))
+				.filter((h): h is Habit => !!h);
+		});
+	};
+
 	React.useEffect(() => {
-		onChange(habits);
+		onChangeHabits(habits);
 	}, [habits]);
 
+	React.useEffect(() => {
+		onChangeSettings({ sortType, customOrder, isIncrease });
+	}, [customOrder, sortType, isIncrease]);
+
 	const containerRef = React.useRef(null);
-	const speed: number = usePointerSpeed(containerRef);
+	useDragAndDrop(containerRef, changeOrder);
+	const scrollOffset: number = useScrollOffset(containerRef);
 
 	React.useEffect(() => {
 		if (containerRef?.current) {
 			const element: HTMLElement = containerRef.current;
-			element.scrollLeft = speed;
+			element.scrollLeft = scrollOffset;
 		}
-	}, [speed]);
+	}, [scrollOffset]);
 
 	const deleteHabit = (habitToDelete: Habit) => {
 		setHabits((prev) =>
@@ -54,11 +88,18 @@ export const App = ({ initialHabits, onChange }: AppProps) => {
 				></HabitSettings>
 			) : (
 				<div className="setting-buttons">
-					<SortPanel setHabits={setHabits}></SortPanel>
+					<SortPanel
+						setHabits={setHabits}
+						sortType={sortType}
+						setSortType={setSortType}
+						customOrder={customOrder}
+						isIncrease={isIncrease}
+						setIncrease={setIncrease}
+					></SortPanel>
 					<button onClick={() => setHabitCreation(true)}>+</button>
 				</div>
 			)}
-			<div className="habits-container" ref={containerRef}>
+			<div className="cells-container" ref={containerRef}>
 				{habits.map((habit) => {
 					return (
 						<HabitBlock

@@ -1,6 +1,7 @@
 import { Plugin } from 'obsidian';
-import { Habit, RawHabitData } from './Models/Habit';
+import { Habit } from './Models/Habit';
 import { ReactWidgetChild } from './ReactWidgetChild';
+import { RawData, SettingData } from './Models/Settings';
 
 export default class ExamplePlugin extends Plugin {
 	async onload() {
@@ -9,23 +10,41 @@ export default class ExamplePlugin extends Plugin {
 			(source, el, ctx) => {
 				const container = el.createDiv();
 
-				const getHabits = (): RawHabitData[] => {
+				const loadData = (): RawData => {
 					try {
 						if (!source.trim()) {
-							return [];
+							return {
+								habits: [],
+								setting: {
+									sortType: 1,
+									customOrder: [],
+									isIncrease: false,
+								},
+							};
 						}
 
-						return JSON.parse(source) as RawHabitData[];
+						return JSON.parse(source) as RawData;
 					} catch (e) {
 						console.error(
 							'Parsing error JSON in multitask code-block:',
 							e
 						);
-						return [];
+						return {
+							habits: [],
+							setting: {
+								sortType: 1,
+								customOrder: [],
+								isIncrease: false,
+							},
+						};
 					}
 				};
 
-				const saveHabits = async (habits: Habit[]) => {
+				//saveSettings
+				const saveData = async (
+					habits: Habit[],
+					settings: SettingData
+				) => {
 					const section = ctx.getSectionInfo(el);
 					if (!section) {
 						return;
@@ -37,7 +56,12 @@ export default class ExamplePlugin extends Plugin {
 					const fileContent = await this.app.vault.read(file);
 					const lines = fileContent.split('\n');
 
-					const newJsonText = JSON.stringify(habits, null, 2);
+					const rawHabits = habits.map((h) => h.toRaw());
+					const rawData: RawData = {
+						habits: rawHabits,
+						setting: settings,
+					};
+					const newJsonText = JSON.stringify(rawData, null, 2);
 					const currentBlockContent = lines
 						.slice(section.lineStart + 1, section.lineEnd)
 						.join('\n');
@@ -59,8 +83,8 @@ export default class ExamplePlugin extends Plugin {
 
 				const child = new ReactWidgetChild(
 					container,
-					saveHabits,
-					getHabits
+					saveData,
+					loadData
 				);
 				ctx.addChild(child);
 			}

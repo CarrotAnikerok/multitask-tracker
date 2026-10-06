@@ -9,7 +9,6 @@ type HabitProps = {
 	handleDelete: (habit: Habit) => void;
 };
 
-// после первого клика за сутки должна блокироваться?
 export default function HabitBlock({
 	habit,
 	handleUpdate,
@@ -18,11 +17,18 @@ export default function HabitBlock({
 	const [size, setSize] = React.useState(habit.size);
 	const [isEdit, setEditing] = React.useState(false);
 
+	if (habit.isAnimateDecrease) {
+		window.setTimeout(() => {
+			habit.decreaseDatedSize();
+			setSize(habit.size);
+		}, 800);
+	}
+
 	const maxSize = habit.maxSize;
-	const pixelSize = 5;
+	const pixelSize = 4.2;
 
 	const changeSize = (addedSize: number) => {
-		// немного странно, переделать наверное
+		// TODO: REDO
 		const newSize = size + addedSize;
 
 		if (newSize <= maxSize && newSize >= 0) {
@@ -34,7 +40,10 @@ export default function HabitBlock({
 
 	const habitHeight = (size / maxSize) * pixelSize;
 	return (
-		<div className="habit-container">
+		<div
+			className={`habit-cell ${isEdit ? 'habit-setting' : ''}`}
+			data-id={habit.id}
+		>
 			{isEdit ? (
 				<HabitSettings
 					onClose={() => setEditing(false)}

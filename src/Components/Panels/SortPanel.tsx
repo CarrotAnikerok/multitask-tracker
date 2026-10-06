@@ -1,31 +1,40 @@
-import React, { Dispatch, SetStateAction, useState } from 'react';
+import React, { Dispatch, SetStateAction, useEffect } from 'react';
 import { Habit } from '../../Models/Habit';
 import FloatingPanel from './FloatingPanel';
+import { SortType } from '../../Models/Settings';
 
 type SortPanelProps = {
 	setHabits: Dispatch<SetStateAction<Habit[]>>;
+	sortType: SortType;
+	setSortType: Dispatch<React.SetStateAction<SortType>>;
+	isIncrease: boolean;
+	setIncrease: Dispatch<React.SetStateAction<boolean>>;
+	customOrder: string[];
 };
 
-enum SortType {
-	Alphabet,
-	LastUpdated,
-	Size,
-}
-
 //TODO: clean
-export default function SortPanel({ setHabits }: SortPanelProps) {
-	const [type, setType] = useState(SortType.Size);
-	const [isIncrease, setIncrease] = useState(false);
-
+export default function SortPanel({
+	setHabits,
+	sortType,
+	setSortType,
+	customOrder,
+	isIncrease,
+	setIncrease,
+}: SortPanelProps) {
 	const changeType = (event: React.ChangeEvent<HTMLSelectElement>) => {
-		const numericValue = Number(event.target.value);
-		setType(numericValue);
-		sort(numericValue, isIncrease);
+		const sortValue = Number(event.target.value);
+		setSortType(sortValue);
+		sort(sortValue, isIncrease);
 	};
+
+	//TODO: remake with LAZY inicialization
+	useEffect(() => {
+		sort(sortType, isIncrease);
+	}, []);
 
 	const changeIncrease = () => {
 		setIncrease((isIncrease) => !isIncrease);
-		sort(type, !isIncrease);
+		sort(sortType, !isIncrease);
 	};
 
 	const sortByPositiveUpdate = (isIncrease: boolean) => {
@@ -75,8 +84,26 @@ export default function SortPanel({ setHabits }: SortPanelProps) {
 		);
 	};
 
+	const getCustomOrder = (isIncrease: boolean) => {
+		setHabits((prev) => {
+			const habitMap = new Map(prev.map((h) => [h.id, h]));
+			const order = customOrder
+				.map((id) => habitMap.get(id))
+				.filter((h): h is Habit => !!h);
+			//TODO: maybe todo like this everywhere
+			if (isIncrease) {
+				return order.reverse();
+			}
+
+			return order;
+		});
+	};
+
 	const sort = (type: SortType, isIncrease: boolean) => {
 		switch (type) {
+			case SortType.Custom:
+				getCustomOrder(isIncrease);
+				break;
 			case SortType.Alphabet:
 				sortByAlphabet(isIncrease);
 				break;
@@ -97,7 +124,8 @@ export default function SortPanel({ setHabits }: SortPanelProps) {
 				content={() => (
 					<div className="sort-panel">
 						Sort by
-						<select value={type} onChange={changeType}>
+						<select value={sortType} onChange={changeType}>
+							<option value={SortType.Custom}>custom</option>
 							<option value={SortType.Alphabet}>
 								alphabetical
 							</option>
