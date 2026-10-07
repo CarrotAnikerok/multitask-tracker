@@ -26,19 +26,29 @@ export default function HabitBlock({
 
 	const maxSize = habit.maxSize;
 	const pixelSize = 4.2;
+	let percent = 0;
 
 	const changeSize = (addedSize: number) => {
 		// TODO: REDO
 		const newSize = size + addedSize;
 
-		if (newSize <= maxSize && newSize >= 0) {
+		if (newSize >= 0) {
 			habit.changeSize(addedSize);
-			setSize(newSize);
+
+			if (newSize <= maxSize) {
+				setSize(newSize);
+			}
+
 			handleUpdate(habit);
 		}
 	};
 
 	const habitHeight = (size / maxSize) * pixelSize;
+
+	if (habit.isRecent) {
+		const oneUnitHeightPercent = Math.round((1 / maxSize) * 100);
+		percent = oneUnitHeightPercent;
+	}
 	return (
 		<div
 			className={`habit-cell ${isEdit ? 'habit-setting' : ''}`}
@@ -61,10 +71,13 @@ export default function HabitBlock({
 					<div className="habit">
 						<div
 							className="habit-block"
-							style={{
-								height: `${habitHeight === 0 ? 0.1 : habitHeight}em`,
-								backgroundColor: habit.color,
-							}}
+							style={
+								{
+									height: `${habitHeight === 0 ? 0.1 : habitHeight}em`,
+									'--habit-color': habit.color,
+									'--percent': `${percent}%`,
+								} as React.CSSProperties
+							}
 						></div>
 						<span>{size}</span>
 					</div>

@@ -90,11 +90,17 @@
 }
 
 .habit-block {
-	background-color: aquamarine;
+	--habit-color: aquamarine;
+	--percent: 0%;
+
 	width: 1.25em;
 	height: 4em;
 	border-radius: 4px;
 	transition: height 200ms ease-in-out;
+	background: linear-gradient(
+		rgb(from var(--habit-color) r g b / 50%) var(--percent),
+		var(--habit-color) var(--percent)
+	);
 }
 
 .size-buttons {

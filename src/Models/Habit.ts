@@ -20,6 +20,7 @@ export class Habit {
 	size: number = 10;
 	maxSize: number = 10;
 	isAnimateDecrease: boolean = false;
+	isRecent: boolean = false;
 	private _positiveUpdates: Date[];
 	private _lastUpdate: Date;
 
@@ -42,6 +43,10 @@ export class Habit {
 			: [new Date()];
 
 		this._lastUpdate = lastUpdate ? new Date(lastUpdate) : new Date();
+
+		// BAD BAD BAD REDO
+		const todayDate = this.getDateStart(new Date());
+		this.isDatedSizeDecrease(todayDate);
 	}
 
 	static fromRaw(raw: RawHabitData): Habit {
@@ -89,9 +94,11 @@ export class Habit {
 		const maxSize = 10;
 		const newSize = this.size + addedSize;
 
-		if (newSize > maxSize || newSize < 0) {
+		if (newSize < 0) {
 			return;
 		}
+
+		this.isRecent = false;
 
 		if (newSize > this.size) {
 			const lastPositiveUpdate = this.getLastPositiveUpdate();
@@ -106,16 +113,19 @@ export class Habit {
 			this._lastUpdate = date;
 		}
 
-		this.size = newSize;
+		if (newSize <= maxSize) {
+			this.size = newSize;
+		}
 	}
 
 	// этот весь функционал в отдельный класс можно
 	// в целом логики много.. странной...
-
+	// CLEAN
 	decreaseDatedSize() {
-		const todayDate = new Date(new Date().setHours(0, 0, 0, 0));
+		const todayDate = this.getDateStart(new Date());
 
 		if (!this.isDatedSizeDecrease(todayDate)) {
+			this.isAnimateDecrease = false;
 			return;
 		}
 		const resultSize = this.calculateDecreaseSizeDated(todayDate);
@@ -125,29 +135,27 @@ export class Habit {
 		this.isAnimateDecrease = false;
 	}
 
-	//CLEAN
+	// doing 2 things, not really how it should be
 	isDatedSizeDecrease(today: Date): boolean {
 		const daysFromLastCheck = this.getDaysBetween(this._lastUpdate, today);
 		const lastPositiveUpdate: Date =
 			this._positiveUpdates[this._positiveUpdates.length - 1]!;
-		const lastPositiveUpdateDay = new Date(lastPositiveUpdate);
-		lastPositiveUpdateDay.setHours(0, 0, 0, 0);
+		const lastPositiveUpdateDay = this.getDateStart(lastPositiveUpdate);
 
-		return (
-			daysFromLastCheck > 0 &&
-			lastPositiveUpdateDay.getTime() + DAY_MS < today.getTime()
-		);
+		const isUpdateWasAFullDayAgo =
+			lastPositiveUpdateDay.getTime() + DAY_MS < today.getTime();
+		this.isRecent =
+			!isUpdateWasAFullDayAgo &&
+			lastPositiveUpdateDay.getTime() < today.getTime();
+		return daysFromLastCheck > 0 && isUpdateWasAFullDayAgo;
 	}
 
 	// TODO: add tests
-	// TODO: можно будет добавить анимации для уменьшения полосочек только при заходе чтобы понять что упало
 	calculateDecreaseSizeDated(today: Date): number {
 		const daysFromLastCheck = this.getDaysBetween(this._lastUpdate, today);
 		const lastPositiveUpdate: Date =
 			this._positiveUpdates[this._positiveUpdates.length - 1]!;
-		const lastPositiveUpdateDay = new Date(lastPositiveUpdate);
-		lastPositiveUpdateDay.setHours(0, 0, 0, 0);
-
+		const lastPositiveUpdateDay = this.getDateStart(lastPositiveUpdate);
 		const daysBetweenPositive = this.getDaysBetween(
 			lastPositiveUpdateDay,
 			today
@@ -165,8 +173,14 @@ export class Habit {
 		return resultSize;
 	}
 
-	private getDaysBetween(earlyDate: Date, lateDate: Date) {
+	private getDaysBetween(earlyDate: Date, lateDate: Date): number {
 		const timeBetween = lateDate.getTime() - earlyDate.getTime();
 		return Math.trunc(timeBetween / DAY_MS);
+	}
+
+	private getDateStart(date: Date) {
+		const startDate = new Date(date);
+		startDate.setHours(0, 0, 0, 0);
+		return startDate;
 	}
 }
