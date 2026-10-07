@@ -19,7 +19,7 @@ export default function HabitBlock({
 
 	if (habit.isAnimateDecrease) {
 		window.setTimeout(() => {
-			habit.decreaseDatedSize();
+			habit.decreaseSizeOnload();
 			setSize(habit.size);
 		}, 800);
 	}
@@ -45,10 +45,11 @@ export default function HabitBlock({
 
 	const habitHeight = (size / maxSize) * pixelSize;
 
-	if (habit.isRecent) {
+	if (habit.isUpdatedYesterday) {
 		const oneUnitHeightPercent = Math.round((1 / maxSize) * 100);
 		percent = oneUnitHeightPercent;
 	}
+
 	return (
 		<div
 			className={`habit-cell ${isEdit ? 'habit-setting' : ''}`}

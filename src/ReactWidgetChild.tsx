@@ -37,15 +37,10 @@ export class ReactWidgetChild extends MarkdownRenderChild {
 			loadedHabits = loadedData;
 		}
 
-		const todayDate = new Date(new Date().setHours(0, 0, 0, 0));
-
 		this.initialSettings = loadedData.setting;
 
 		this.initialHabits = loadedHabits.map((raw: RawHabitData) => {
-			const newHabit = Habit.fromRaw(raw);
-			newHabit.calculateDecreaseSizeDated(todayDate);
-
-			return newHabit;
+			return Habit.fromRaw(raw);
 		});
 	}
 

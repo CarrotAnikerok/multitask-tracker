@@ -27,10 +27,11 @@ export default function SortPanel({
 		sort(sortValue, isIncrease);
 	};
 
-	//TODO: remake with LAZY inicialization
-	useEffect(() => {
-		sort(sortType, isIncrease);
-	}, []);
+	//TODO IMPORTANT: remake with LAZY inicialization
+	//
+	// useEffect(() => {
+	// 	sort(sortType, isIncrease);
+	// }, []);
 
 	const changeIncrease = () => {
 		setIncrease((isIncrease) => !isIncrease);
