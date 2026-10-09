@@ -25,13 +25,14 @@ export const App = ({
 	const [isHabitCreation, setHabitCreation] = React.useState(false);
 	const {
 		customOrder,
-        setAndGetCustomSorting,
-        sortType,
-        isIncrease,
-        setAndGetSorting
-	 } = useHabitSort(initialSettings);
-	const [habits, setHabits] = React.useState<Habit[]>(
-		() => getSortedHabits(initialHabits, customOrder, sortType, isIncrease)
+		setAndGetCustomSorting,
+		sortType,
+		isIncrease,
+		setAndGetSorting,
+		setCustomOrder,
+	} = useHabitSort(initialSettings);
+	const [habits, setHabits] = React.useState<Habit[]>(() =>
+		getSortedHabits(initialHabits, customOrder, sortType, isIncrease)
 	);
 
 	const changeOrder = (newIdsOrder: string[]) => {
@@ -39,8 +40,10 @@ export const App = ({
 	};
 
 	const sortHabits = (sort: SortType, increase: boolean) => {
-		setHabits(prevHabits => setAndGetSorting(prevHabits, customOrder, sort, increase));
-	}
+		setHabits((prevHabits) =>
+			setAndGetSorting(prevHabits, customOrder, sort, increase)
+		);
+	};
 
 	React.useEffect(() => {
 		onChangeHabits(habits);
@@ -65,6 +68,7 @@ export const App = ({
 		setHabits((prev) =>
 			prev.filter((habit) => habit.id !== habitToDelete.id)
 		);
+		setCustomOrder((prev) => prev.filter((id) => id !== habitToDelete.id));
 	};
 
 	const updateHabits = (habitToUpdate: Habit) => {
@@ -74,7 +78,9 @@ export const App = ({
 				prev.map((h) => (h.id === habitToUpdate.id ? habitToUpdate : h))
 			);
 		} else {
+			// maybe better to do it at once?
 			setHabits((prev) => [...prev, habitToUpdate]);
+			setCustomOrder((prev) => [...prev, habitToUpdate.id]);
 		}
 	};
 

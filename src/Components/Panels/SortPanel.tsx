@@ -9,7 +9,9 @@ type SortPanelProps = {
 };
 
 export default function SortPanel({
-	sortHabits, sortType, isIncrease
+	sortHabits,
+	sortType,
+	isIncrease,
 }: SortPanelProps) {
 	const changeType = (event: React.ChangeEvent<HTMLSelectElement>) => {
 		const sortValue = Number(event.target.value);

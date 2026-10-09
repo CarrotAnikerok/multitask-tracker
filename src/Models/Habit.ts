@@ -28,7 +28,7 @@ export class Habit {
 		size?: number,
 		id?: string,
 		positiveDates?: string[],
-		lastUpdate?: string,
+		lastUpdate?: string
 	) {
 		this.name = name;
 		this.size = size || size === 0 ? size : maxSize;
