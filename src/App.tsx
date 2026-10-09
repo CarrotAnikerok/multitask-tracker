@@ -6,6 +6,8 @@ import SortPanel from './Components/Panels/SortPanel';
 import { useScrollOffset } from './hooks/usePointerSpeed';
 import { useDragAndDrop } from './hooks/useDragAndDrop';
 import { SettingData, SortType } from './Models/Settings';
+import { getSortedHabits } from './utils/sortHabits';
+import { useHabitSort } from './hooks/useHabitSort';
 
 type AppProps = {
 	onChangeHabits: (habits: Habit[]) => void;
@@ -20,28 +22,25 @@ export const App = ({
 	onChangeSettings,
 	initialSettings,
 }: AppProps) => {
-	const [habits, setHabits] = React.useState<Habit[]>(initialHabits);
 	const [isHabitCreation, setHabitCreation] = React.useState(false);
-
-	//TODO: move to other component?
-	const [customOrder, setCustomOrder] = React.useState(
-		initialSettings.customOrder
-	);
-	const [sortType, setSortType] = React.useState(initialSettings.sortType);
-	const [isIncrease, setIncrease] = React.useState(
-		initialSettings.isIncrease
+	const {
+		customOrder,
+        setAndGetCustomSorting,
+        sortType,
+        isIncrease,
+        setAndGetSorting
+	 } = useHabitSort(initialSettings);
+	const [habits, setHabits] = React.useState<Habit[]>(
+		() => getSortedHabits(initialHabits, customOrder, sortType, isIncrease)
 	);
 
 	const changeOrder = (newIdsOrder: string[]) => {
-		setCustomOrder(newIdsOrder);
-		setSortType(SortType.Custom);
-		setHabits((prev) => {
-			const habitMap = new Map(prev.map((h) => [h.id, h]));
-			return newIdsOrder
-				.map((id) => habitMap.get(id))
-				.filter((h): h is Habit => !!h);
-		});
+		setHabits((prev) => setAndGetCustomSorting(prev, newIdsOrder));
 	};
+
+	const sortHabits = (sort: SortType, increase: boolean) => {
+		setHabits(prevHabits => setAndGetSorting(prevHabits, customOrder, sort, increase));
+	}
 
 	React.useEffect(() => {
 		onChangeHabits(habits);
@@ -89,12 +88,9 @@ export const App = ({
 			) : (
 				<div className="setting-buttons">
 					<SortPanel
-						setHabits={setHabits}
+						sortHabits={sortHabits}
 						sortType={sortType}
-						setSortType={setSortType}
-						customOrder={customOrder}
 						isIncrease={isIncrease}
-						setIncrease={setIncrease}
 					></SortPanel>
 					<button onClick={() => setHabitCreation(true)}>+</button>
 				</div>

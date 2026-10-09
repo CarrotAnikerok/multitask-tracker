@@ -18,7 +18,7 @@ export class Habit {
 
 	size: number = 10;
 	maxSize: number = 10;
-	isAnimateDecrease: boolean = true;
+	isAnimateDecrease;
 	private _habitDate: HabitTimeline;
 
 	constructor(
@@ -28,7 +28,7 @@ export class Habit {
 		size?: number,
 		id?: string,
 		positiveDates?: string[],
-		lastUpdate?: string
+		lastUpdate?: string,
 	) {
 		this.name = name;
 		this.size = size || size === 0 ? size : maxSize;
@@ -36,6 +36,7 @@ export class Habit {
 		this.maxSize = maxSize;
 		this.id = id ? id : generateCode();
 		this._habitDate = new HabitTimeline(positiveDates, lastUpdate);
+		this.isAnimateDecrease = this._habitDate.isShouldDecrease();
 	}
 
 	static fromRaw(raw: RawHabitData): Habit {
@@ -77,7 +78,6 @@ export class Habit {
 	}
 
 	changeSize(addedSize: number) {
-		const maxSize = 10;
 		const newSize = this.size + addedSize;
 
 		if (newSize < 0) {
@@ -85,24 +85,23 @@ export class Habit {
 		}
 
 		if (
-			(newSize > this.size && newSize <= maxSize) ||
+			(newSize > this.size && newSize <= this.maxSize) ||
 			this.isUpdatedYesterday
 		) {
 			this._habitDate.addPositiveUpdate();
 		}
 
-		if (newSize <= maxSize) {
+		if (newSize <= this.maxSize) {
 			this.size = newSize;
 		}
 	}
 
 	decreaseSizeOnload() {
-		this.isAnimateDecrease = false;
-
-		if (!this._habitDate.isShouldDecrease()) {
+		if (!this.isAnimateDecrease) {
 			return;
 		}
 
+		this.isAnimateDecrease = false;
 		const resultSize = this.calculateDecreaseSize();
 		this.size = resultSize > 0 ? resultSize : 0;
 		this._habitDate.setLastUpdate();
