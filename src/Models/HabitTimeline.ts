@@ -35,6 +35,13 @@ export class HabitTimeline {
 		);
 	}
 
+	get isIncreasedToday(): boolean {
+		return (
+			this.getLastPositiveUpdate().getDate() ===
+			this._currentLoadDay.getDate()
+		);
+	}
+
 	addPositiveUpdate() {
 		const date = new Date();
 

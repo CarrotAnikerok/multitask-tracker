@@ -15,7 +15,7 @@ export default function HabitSettings({
 	existingHabit,
 }: SettingsProps) {
 	const [name, setName] = React.useState(existingHabit?.name || '');
-	const [size, setSize] = React.useState(existingHabit?.size || '');
+	const [maxSize, setMaxSize] = React.useState(existingHabit?.maxSize || '');
 	const [color, setColor] = React.useState(
 		existingHabit?.color || getRandomColor()
 	);
@@ -28,7 +28,7 @@ export default function HabitSettings({
 		nameError = false;
 	}
 
-	const sizeNumber = Number(size);
+	const sizeNumber = Number(maxSize);
 	if (Number.isNaN(sizeNumber) || sizeNumber < 0 || sizeNumber > 150) {
 		sizeError = true;
 	} else {
@@ -38,14 +38,18 @@ export default function HabitSettings({
 	const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
 		e.preventDefault();
 
-		const maxSize = Number(size) || 5;
+		const newMaxSize = Number(maxSize) || 5;
 		const finalName = name || 'New habit';
 
 		if (existingHabit) {
-			existingHabit.updateSettings({ name: finalName, color, maxSize });
+			existingHabit.updateSettings({
+				name: finalName,
+				color,
+				maxSize: newMaxSize,
+			});
 			updateOrCreate(existingHabit);
 		} else {
-			const newHabit = new Habit(finalName, maxSize, color);
+			const newHabit = new Habit(finalName, newMaxSize, color);
 			updateOrCreate(newHabit);
 		}
 		onClose();
@@ -83,8 +87,8 @@ export default function HabitSettings({
 						name="maxSize"
 						type="text"
 						className={sizeError ? 'error' : ''}
-						value={size}
-						onChange={(e) => setSize(e.target.value)}
+						value={maxSize}
+						onChange={(e) => setMaxSize(e.target.value)}
 					></input>
 					{sizeError ? (
 						<Tooltip>Should be less than 150</Tooltip>

@@ -13,6 +13,7 @@ export function useDragAndDrop(
 
 	React.useEffect(() => {
 		const HOLD_DELAY = 650;
+		let previousClientX = 0;
 		let holdTimeout: number | null = null;
 
 		if (!containerRef.current) {
@@ -65,13 +66,16 @@ export function useDragAndDrop(
 			if (!isHolding || !target) return;
 
 			const afterElement: HTMLElement | null = getAfterPointerElement(
-				ev.clientX
+				ev.clientX,
+				previousClientX > ev.clientX
 			);
-			if (target && afterElement !== null) {
+			if (afterElement !== null) {
 				container.insertBefore(target, afterElement);
 			} else {
 				container.append(target);
 			}
+
+			previousClientX = ev.clientX;
 		};
 
 		const onExternalDragStart = () => {
@@ -105,14 +109,20 @@ type AfterElement = {
 	element: HTMLElement | null;
 };
 
-function getAfterPointerElement(x: number): HTMLElement | null {
+function getAfterPointerElement(
+	x: number,
+	isLeft: boolean
+): HTMLElement | null {
 	const staticBlocks = Array.from(
 		document.querySelectorAll('.habit-cell:not(.hold)')
 	);
+	const OFFSET_COEFF = 0.3;
+	const sensitivityThreshold = isLeft ? 1 - OFFSET_COEFF : OFFSET_COEFF;
 	const afterPointerElement: AfterElement = staticBlocks.reduce<AfterElement>(
 		(closest, child) => {
 			const box = child.getBoundingClientRect();
-			const offset = x - box.left - box.width / 2;
+			const triggerPoint = box.left + box.width * sensitivityThreshold;
+			const offset = x - triggerPoint;
 
 			if (offset < 0 && offset > closest.offset) {
 				return { offset: offset, element: child as HTMLElement };

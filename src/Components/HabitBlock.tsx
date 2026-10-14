@@ -15,13 +15,16 @@ export default function HabitBlock({
 	handleDelete,
 }: HabitProps) {
 	const [size, setSize] = React.useState(habit.size);
+	const [isIncreased, setIsIncreased] = React.useState(
+		habit.isIncreasedToday
+	);
 	const [isEdit, setEditing] = React.useState(false);
 
 	if (habit.isAnimateDecrease) {
 		window.setTimeout(() => {
 			habit.decreaseSizeOnload();
 			setSize(habit.size);
-		}, 800);
+		}, 1200);
 	}
 
 	const maxSize = habit.maxSize;
@@ -32,13 +35,16 @@ export default function HabitBlock({
 		// TODO: REDO
 		const newSize = size + addedSize;
 
-		if (newSize >= 0) {
-			habit.changeSize(addedSize);
+		if (!isIncreased && addedSize > 0) {
+			setIsIncreased(true);
+		}
 
+		if (newSize >= 0) {
 			if (newSize <= maxSize) {
 				setSize(newSize);
 			}
 
+			habit.changeSize(addedSize);
 			handleUpdate(habit);
 		}
 	};
@@ -84,7 +90,7 @@ export default function HabitBlock({
 					</div>
 					<div className="size-buttons">
 						<button
-							className="custom-button"
+							className={`custom-button ${isIncreased ? 'increased' : ''}`}
 							onClick={() => changeSize(1)}
 						>
 							⭡

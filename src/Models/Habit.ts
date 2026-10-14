@@ -55,6 +55,10 @@ export class Habit {
 		return this._habitDate.isUpdatedYesterday;
 	}
 
+	get isIncreasedToday() {
+		return this._habitDate.isIncreasedToday;
+	}
+
 	getLastPositiveUpdate() {
 		return this._habitDate.getLastPositiveUpdate();
 	}
