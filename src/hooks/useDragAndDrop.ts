@@ -1,17 +1,14 @@
-import React from 'react';
+import { RefObject, useEffect, useState } from 'react';
+import { isTargetInteractive } from '../utils/utils';
 
 export function useDragAndDrop(
-	containerRef: React.RefObject<HTMLElement | null>,
+	containerRef: RefObject<HTMLElement | null>,
 	onOrderChange: (newIdsOrder: string[]) => void
 ) {
-	const [isHolding, setHolding] = React.useState(false);
-	const [target, setTarget] = React.useState<HTMLElement | null>(null);
+	const [isHolding, setHolding] = useState(false);
+	const [target, setTarget] = useState<HTMLElement | null>(null);
 
-	//перечитать про useref
-	const onOrderChangeRef = React.useRef(onOrderChange);
-	onOrderChangeRef.current = onOrderChange;
-
-	React.useEffect(() => {
+	useEffect(() => {
 		const HOLD_DELAY = 650;
 		let previousClientX = 0;
 		let holdTimeout: number | null = null;
@@ -52,7 +49,7 @@ export function useDragAndDrop(
 					.map((cell) => cell.dataset.id)
 					.filter(Boolean) as string[];
 
-				onOrderChangeRef.current(newIdsOrder);
+				onOrderChange(newIdsOrder);
 			}
 
 			setHolding(false);
@@ -67,7 +64,8 @@ export function useDragAndDrop(
 
 			const afterElement: HTMLElement | null = getAfterPointerElement(
 				ev.clientX,
-				previousClientX > ev.clientX
+				previousClientX > ev.clientX,
+				container
 			);
 			if (afterElement !== null) {
 				container.insertBefore(target, afterElement);
@@ -111,10 +109,11 @@ type AfterElement = {
 
 function getAfterPointerElement(
 	x: number,
-	isLeft: boolean
+	isLeft: boolean,
+	container: HTMLElement
 ): HTMLElement | null {
 	const staticBlocks = Array.from(
-		document.querySelectorAll('.habit-cell:not(.hold)')
+		container.querySelectorAll('.habit-cell:not(.hold)')
 	);
 	const OFFSET_COEFF = 0.3;
 	const sensitivityThreshold = isLeft ? 1 - OFFSET_COEFF : OFFSET_COEFF;
@@ -134,9 +133,4 @@ function getAfterPointerElement(
 	);
 
 	return afterPointerElement.element;
-}
-
-function isTargetInteractive(event: PointerEvent) {
-	const target = event.target as HTMLElement;
-	return target && (target.closest('button') || target.closest('input'));
 }

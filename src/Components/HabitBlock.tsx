@@ -1,7 +1,7 @@
-import React from 'react';
 import { Habit } from '../Models/Habit';
 import EditPanel from './Panels/EditPanel';
 import HabitSettings from './HabitSettings';
+import { CSSProperties, useState } from 'react';
 
 type HabitProps = {
 	habit: Habit;
@@ -14,11 +14,11 @@ export default function HabitBlock({
 	handleUpdate,
 	handleDelete,
 }: HabitProps) {
-	const [size, setSize] = React.useState(habit.size);
-	const [isIncreased, setIsIncreased] = React.useState(
+	const [size, setSize] = useState(habit.size);
+	const [isIncreasedToday, setIsIncreasedToday] = useState(
 		habit.isIncreasedToday
 	);
-	const [isEdit, setEditing] = React.useState(false);
+	const [isEdit, setEditing] = useState(false);
 
 	if (habit.isAnimateDecrease) {
 		window.setTimeout(() => {
@@ -32,12 +32,7 @@ export default function HabitBlock({
 	let percent = 0;
 
 	const changeSize = (addedSize: number) => {
-		// TODO: REDO
 		const newSize = size + addedSize;
-
-		if (!isIncreased && addedSize > 0) {
-			setIsIncreased(true);
-		}
 
 		if (newSize >= 0) {
 			if (newSize <= maxSize) {
@@ -46,6 +41,10 @@ export default function HabitBlock({
 
 			habit.changeSize(addedSize);
 			handleUpdate(habit);
+		}
+
+		if (!isIncreasedToday && addedSize > 0) {
+			setIsIncreasedToday(true);
 		}
 	};
 
@@ -83,14 +82,14 @@ export default function HabitBlock({
 									height: `${habitHeight === 0 ? 0.1 : habitHeight}em`,
 									'--habit-color': habit.color,
 									'--percent': `${percent}%`,
-								} as React.CSSProperties
+								} as CSSProperties
 							}
 						></div>
 						<span>{size}</span>
 					</div>
 					<div className="size-buttons">
 						<button
-							className={`custom-button ${isIncreased ? 'increased' : ''}`}
+							className={`custom-button ${isIncreasedToday ? 'increased' : ''}`}
 							onClick={() => changeSize(1)}
 						>
 							⭡

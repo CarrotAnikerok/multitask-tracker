@@ -31,7 +31,6 @@ export class ReactWidgetChild extends MarkdownRenderChild {
 	loadHabits() {
 		const loadedData = this.onLoadData();
 		if ('habits' in loadedData) {
-			//eslint-disable-next-line no-var -- var have a logic here
 			var loadedHabits = loadedData.habits;
 		} else {
 			loadedHabits = loadedData;

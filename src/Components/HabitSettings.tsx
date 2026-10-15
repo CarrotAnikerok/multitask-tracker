@@ -1,7 +1,7 @@
-import * as React from 'react';
 import { Habit } from '../Models/Habit';
 import Tooltip from './Tooltip';
 import { getRandomColor } from '../utils/utils';
+import { SubmitEvent, useState } from 'react';
 
 type SettingsProps = {
 	onClose: () => void;
@@ -14,9 +14,9 @@ export default function HabitSettings({
 	updateOrCreate,
 	existingHabit,
 }: SettingsProps) {
-	const [name, setName] = React.useState(existingHabit?.name || '');
-	const [maxSize, setMaxSize] = React.useState(existingHabit?.maxSize || '');
-	const [color, setColor] = React.useState(
+	const [name, setName] = useState(existingHabit?.name || '');
+	const [maxSize, setMaxSize] = useState(existingHabit?.maxSize || '');
+	const [color, setColor] = useState(
 		existingHabit?.color || getRandomColor()
 	);
 	let nameError: boolean = false;
@@ -35,7 +35,7 @@ export default function HabitSettings({
 		sizeError = false;
 	}
 
-	const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
+	const handleSubmit = (e: SubmitEvent<HTMLFormElement>) => {
 		e.preventDefault();
 
 		const newMaxSize = Number(maxSize) || 5;

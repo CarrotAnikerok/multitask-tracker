@@ -1,4 +1,3 @@
-import * as React from 'react';
 import HabitBlock from './Components/HabitBlock';
 import HabitSettings from './Components/HabitSettings';
 import { Habit } from './Models/Habit';
@@ -8,6 +7,7 @@ import { useDragAndDrop } from './hooks/useDragAndDrop';
 import { SettingData, SortType } from './Models/Settings';
 import { getSortedHabits } from './utils/sortHabits';
 import { useHabitSort } from './hooks/useHabitSort';
+import { useEffect, useRef, useState } from 'react';
 
 type AppProps = {
 	onChangeHabits: (habits: Habit[]) => void;
@@ -22,7 +22,7 @@ export const App = ({
 	onChangeSettings,
 	initialSettings,
 }: AppProps) => {
-	const [isHabitCreation, setHabitCreation] = React.useState(false);
+	const [isHabitCreation, setHabitCreation] = useState(false);
 	const {
 		customOrder,
 		setAndGetCustomSorting,
@@ -31,9 +31,17 @@ export const App = ({
 		setAndGetSorting,
 		setCustomOrder,
 	} = useHabitSort(initialSettings);
-	const [habits, setHabits] = React.useState<Habit[]>(() =>
+	const [habits, setHabits] = useState<Habit[]>(() =>
 		getSortedHabits(initialHabits, customOrder, sortType, isIncrease)
 	);
+
+	useEffect(() => {
+		onChangeHabits(habits);
+	}, [habits]);
+
+	useEffect(() => {
+		onChangeSettings({ sortType, customOrder, isIncrease });
+	}, [customOrder, sortType, isIncrease]);
 
 	const changeOrder = (newIdsOrder: string[]) => {
 		setHabits((prev) => setAndGetCustomSorting(prev, newIdsOrder));
@@ -45,19 +53,11 @@ export const App = ({
 		);
 	};
 
-	React.useEffect(() => {
-		onChangeHabits(habits);
-	}, [habits]);
-
-	React.useEffect(() => {
-		onChangeSettings({ sortType, customOrder, isIncrease });
-	}, [customOrder, sortType, isIncrease]);
-
-	const containerRef = React.useRef(null);
+	const containerRef = useRef(null);
 	useDragAndDrop(containerRef, changeOrder);
 	const scrollOffset: number = useScrollOffset(containerRef);
 
-	React.useEffect(() => {
+	useEffect(() => {
 		if (containerRef?.current) {
 			const element: HTMLElement = containerRef.current;
 			element.scrollLeft = scrollOffset;
@@ -73,12 +73,12 @@ export const App = ({
 
 	const updateHabits = (habitToUpdate: Habit) => {
 		const isHabitExist = habits.some((h) => h.id === habitToUpdate.id);
+
 		if (isHabitExist) {
 			setHabits((prev) =>
 				prev.map((h) => (h.id === habitToUpdate.id ? habitToUpdate : h))
 			);
 		} else {
-			// maybe better to do it at once?
 			setHabits((prev) => [...prev, habitToUpdate]);
 			setCustomOrder((prev) => [...prev, habitToUpdate.id]);
 		}

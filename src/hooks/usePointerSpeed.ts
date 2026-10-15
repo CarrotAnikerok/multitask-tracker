@@ -1,11 +1,10 @@
-import * as React from 'react';
+import { RefObject, useEffect, useState } from 'react';
+import { isTargetInteractive } from '../utils/utils';
 
-export function useScrollOffset(
-	containerRef: React.RefObject<HTMLElement | null>
-) {
-	const [scrollOffset, setScrollOffset] = React.useState(0);
+export function useScrollOffset(containerRef: RefObject<HTMLElement | null>) {
+	const [scrollOffset, setScrollOffset] = useState(0);
 
-	React.useEffect(() => {
+	useEffect(() => {
 		let velocity = 0;
 		let startX = 0;
 		let startY = 0;
@@ -16,6 +15,8 @@ export function useScrollOffset(
 
 		let isDragging = false;
 		let isHolding = false;
+
+		let animationFrameId: number | null = null;
 
 		if (!containerRef.current) {
 			return;
@@ -46,12 +47,16 @@ export function useScrollOffset(
 
 			(function animateInertia() {
 				const inertiaVelocity = velocity * INERTIA_COEFFICIENT;
+
 				if (Math.abs(inertiaVelocity) > 0.1) {
 					setScrollOffset(
 						(scrollOffset) => scrollOffset - inertiaVelocity
 					);
 					velocity *= SLOWDOWN_COEFFICIENT;
-					window.requestAnimationFrame(animateInertia);
+					animationFrameId =
+						window.requestAnimationFrame(animateInertia);
+				} else {
+					animationFrameId = null;
 				}
 			})();
 		};
@@ -113,6 +118,10 @@ export function useScrollOffset(
 		window.addEventListener('multitask:hold-started', onExternalDragHold);
 
 		return () => {
+			if (animationFrameId !== null) {
+				window.cancelAnimationFrame(animationFrameId);
+			}
+
 			containerToScroll.removeEventListener('pointerdown', dragStart);
 			containerToScroll.removeEventListener('pointerup', dragEnd);
 			containerToScroll.removeEventListener('pointermove', drag);
@@ -124,9 +133,4 @@ export function useScrollOffset(
 	}, [containerRef]);
 
 	return scrollOffset;
-}
-
-function isTargetInteractive(event: PointerEvent) {
-	const target = event.target as HTMLElement;
-	return target && (target.closest('button') || target.closest('input'));
 }

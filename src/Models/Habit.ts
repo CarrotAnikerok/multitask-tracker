@@ -18,7 +18,7 @@ export class Habit {
 
 	size: number = 10;
 	maxSize: number = 10;
-	isAnimateDecrease;
+	isAnimateDecrease: boolean;
 	private _habitDate: HabitTimeline;
 
 	constructor(

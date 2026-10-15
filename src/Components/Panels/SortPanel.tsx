@@ -1,6 +1,6 @@
-import React from 'react';
 import FloatingPanel from './FloatingPanel';
 import { SortType } from '../../Models/Settings';
+import { ChangeEvent } from 'react';
 
 type SortPanelProps = {
 	sortHabits: (sort: SortType, increase: boolean) => void;
@@ -13,7 +13,7 @@ export default function SortPanel({
 	sortType,
 	isIncrease,
 }: SortPanelProps) {
-	const changeType = (event: React.ChangeEvent<HTMLSelectElement>) => {
+	const changeType = (event: ChangeEvent<HTMLSelectElement>) => {
 		const sortValue = Number(event.target.value);
 		sortHabits(sortValue, isIncrease);
 	};

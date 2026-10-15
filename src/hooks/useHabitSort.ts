@@ -1,16 +1,12 @@
-import React from 'react';
 import { SettingData, SortType } from '../Models/Settings';
 import { Habit } from '../Models/Habit';
 import { getCustomSortedHabits, getSortedHabits } from '../utils/sortHabits';
+import { useState } from 'react';
 
 export function useHabitSort(initialSettings: SettingData) {
-	const [customOrder, setCustomOrder] = React.useState(
-		initialSettings.customOrder
-	);
-	const [sortType, setSortType] = React.useState(initialSettings.sortType);
-	const [isIncrease, setIncrease] = React.useState(
-		initialSettings.isIncrease
-	);
+	const [customOrder, setCustomOrder] = useState(initialSettings.customOrder);
+	const [sortType, setSortType] = useState(initialSettings.sortType);
+	const [isIncrease, setIncrease] = useState(initialSettings.isIncrease);
 
 	const setAndGetSorting = (
 		habits: Habit[],

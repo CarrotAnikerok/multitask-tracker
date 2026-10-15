@@ -57,12 +57,14 @@
 .hold::before {
 	content: '';
 	position: absolute;
-	border: 2px solid var(--color-accent);
-	border-radius: 5px;
 	top: 0;
 	bottom: 0;
 	left: -4px;
 	right: -4px;
+	border-radius: 5px;
+	background-color: var(--background-secondary);
+	z-index: -10;
+	margin: 1px;
 }
 
 .habit-setting {
@@ -197,10 +199,10 @@ input {
 }
 
 .floating-panel {
-	position: relative;
-	height: 0em;
-	width: 0em;
-	right: 1.3em;
+	font-family: var(--font-monospace-default);
+	width: auto;
+	height: auto;
+	pointer-events: auto;
 }
 
 .edit-panel-buttons {

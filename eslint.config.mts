@@ -28,5 +28,10 @@ export default defineConfig(
 			},
 		},
 	},
-	...obsidianmd.configs.recommended
+	...obsidianmd.configs.recommended,
+	{
+		rules: {
+			'no-var': 'off',
+		},
+	}
 );

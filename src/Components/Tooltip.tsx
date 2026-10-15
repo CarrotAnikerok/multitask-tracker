@@ -1,7 +1,7 @@
-import React from 'react';
+import { ReactNode } from 'react';
 
 type TooltipProps = {
-	children: React.ReactNode;
+	children: ReactNode;
 };
 
 export default function Tooltip({ children }: TooltipProps) {

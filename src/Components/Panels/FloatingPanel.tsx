@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 
 type FloatingPanelProps = {
 	children: React.ReactNode;
@@ -12,10 +13,21 @@ export default function FloatingPanel({
 	className,
 }: FloatingPanelProps) {
 	const [isPanel, setPanel] = useState(false);
+	const [coords, setCoords] = useState({ top: 0, left: 0 });
+
 	const panelRef = useRef(null);
 	const triggerRef = useRef(null);
 
 	const toggleVisibility = () => {
+		if (!isPanel && triggerRef.current) {
+			const rect = (
+				triggerRef.current as HTMLElement
+			).getBoundingClientRect();
+			setCoords({
+				top: rect.bottom + 5,
+				left: rect.left - 20,
+			});
+		}
 		setPanel(!isPanel);
 	};
 
@@ -48,11 +60,23 @@ export default function FloatingPanel({
 			>
 				{children}
 			</button>
-			{isPanel ? (
-				<div ref={panelRef} className="floating-panel">
-					{content(() => setPanel(false))}
-				</div>
-			) : null}
+			{isPanel
+				? createPortal(
+						<div
+							ref={panelRef}
+							className="floating-panel"
+							style={{
+								position: 'absolute',
+								top: `${coords.top}px`,
+								left: `${coords.left}px`,
+								zIndex: 99999,
+							}}
+						>
+							{content(() => setPanel(false))}
+						</div>,
+						document.body
+					)
+				: null}
 		</div>
 	);
 }
