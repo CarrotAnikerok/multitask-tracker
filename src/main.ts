@@ -40,18 +40,14 @@ export default class ExamplePlugin extends Plugin {
 					}
 				};
 
-				//saveSettings
 				const saveData = async (
 					habits: Habit[],
 					settings: SettingData
 				) => {
 					const section = ctx.getSectionInfo(el);
-					if (!section) {
-						return;
-					}
-
 					const file = this.app.vault.getFileByPath(ctx.sourcePath);
-					if (!file) return;
+
+					if (!section || !file) return;
 
 					const fileContent = await this.app.vault.read(file);
 					const lines = fileContent.split('\n');
@@ -66,9 +62,8 @@ export default class ExamplePlugin extends Plugin {
 						.slice(section.lineStart + 1, section.lineEnd)
 						.join('\n');
 
-					if (currentBlockContent.trim() === newJsonText.trim()) {
+					if (currentBlockContent.trim() === newJsonText.trim())
 						return;
-					}
 
 					const updatedLines = [
 						...lines.slice(0, section.lineStart),

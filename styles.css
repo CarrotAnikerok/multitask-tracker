@@ -57,12 +57,14 @@
 .hold::before {
 	content: '';
 	position: absolute;
-	border: 2px solid var(--color-accent);
-	border-radius: 5px;
 	top: 0;
 	bottom: 0;
 	left: -4px;
 	right: -4px;
+	border-radius: 5px;
+	background-color: var(--background-secondary);
+	z-index: -10;
+	margin: 1px;
 }
 
 .habit-setting {
@@ -90,11 +92,17 @@
 }
 
 .habit-block {
-	background-color: aquamarine;
+	--habit-color: aquamarine;
+	--percent: 0%;
+
 	width: 1.25em;
 	height: 4em;
 	border-radius: 4px;
 	transition: height 200ms ease-in-out;
+	background: linear-gradient(
+		rgb(from var(--habit-color) r g b / 50%) var(--percent),
+		var(--habit-color) var(--percent)
+	);
 }
 
 .size-buttons {
@@ -109,6 +117,10 @@
 	padding: 7px;
 }
 
+.custom-button.increased {
+	background-color: var(--color-accent);
+}
+
 /*HABIT SETTING MENU*/
 
 .settings {
@@ -116,6 +128,7 @@
 	grid-column: span 3;
 	place-self: center;
 	background-color: var(--background-primary-alt);
+	font-family: var(--font-text);
 
 	display: flex;
 	gap: 5px;
@@ -150,6 +163,10 @@
 	padding-bottom: 5px;
 }
 
+.form-fields input {
+	width: 6em;
+}
+
 .form-fields .error {
 	border: 1px solid red;
 }
@@ -182,10 +199,17 @@ input {
 }
 
 .floating-panel {
-	position: relative;
-	height: 0em;
-	width: 0em;
-	right: 1.3em;
+	font-family: var(--font-monospace-default);
+	width: auto;
+	height: auto;
+	pointer-events: auto;
+}
+
+.edit-panel-buttons {
+	display: flex;
+	flex-direction: column;
+	gap: 0;
+	line-height: 1;
 }
 
 .edit-panel-buttons button {
@@ -194,6 +218,16 @@ input {
 	height: 2em;
 	margin: 0;
 	border-radius: 0;
+}
+
+.edit-panel-buttons button:first-of-type {
+	border-top-left-radius: 4px;
+	border-top-right-radius: 4px;
+}
+
+.edit-panel-buttons button:last-of-type {
+	border-bottom-left-radius: 4px;
+	border-bottom-right-radius: 4px;
 }
 
 /*OTHER*/

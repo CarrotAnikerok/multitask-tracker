@@ -1,6 +1,5 @@
 import { generateCode } from '../utils/utils';
-
-const DAY_MS = 24 * 3600 * 1000;
+import { HabitTimeline } from './HabitTimeline';
 
 export type RawHabitData = {
 	id: string;
@@ -19,9 +18,8 @@ export class Habit {
 
 	size: number = 10;
 	maxSize: number = 10;
-	isAnimateDecrease: boolean = false;
-	private _positiveUpdates: Date[];
-	private _lastUpdate: Date;
+	isAnimateDecrease: boolean;
+	private _habitDate: HabitTimeline;
 
 	constructor(
 		name: string,
@@ -37,11 +35,8 @@ export class Habit {
 		this.color = color;
 		this.maxSize = maxSize;
 		this.id = id ? id : generateCode();
-		this._positiveUpdates = positiveDates
-			? positiveDates.map((d) => new Date(d))
-			: [new Date()];
-
-		this._lastUpdate = lastUpdate ? new Date(lastUpdate) : new Date();
+		this._habitDate = new HabitTimeline(positiveDates, lastUpdate);
+		this.isAnimateDecrease = this._habitDate.isShouldDecrease();
 	}
 
 	static fromRaw(raw: RawHabitData): Habit {
@@ -56,6 +51,18 @@ export class Habit {
 		);
 	}
 
+	get isUpdatedYesterday() {
+		return this._habitDate.isUpdatedYesterday;
+	}
+
+	get isIncreasedToday() {
+		return this._habitDate.isIncreasedToday;
+	}
+
+	getLastPositiveUpdate() {
+		return this._habitDate.getLastPositiveUpdate();
+	}
+
 	toRaw(): RawHabitData {
 		return {
 			id: this.id,
@@ -63,20 +70,9 @@ export class Habit {
 			maxSize: this.maxSize,
 			size: this.size,
 			color: this.color,
-			positiveUpdates: this._positiveUpdates.map((u) => u.toISOString()),
-			lastUpdate: this._lastUpdate.toISOString(),
+			positiveUpdates: this._habitDate.positiveUpdates,
+			lastUpdate: this._habitDate.lastUpdate,
 		};
-	}
-
-	getLastPositiveUpdate(): Date {
-		const lastIndex = this._positiveUpdates.length - 1;
-		const lastPositiveUpdate = this._positiveUpdates[lastIndex];
-
-		if (!lastPositiveUpdate) {
-			throw new Error('There is no last positive update');
-		}
-
-		return lastPositiveUpdate;
 	}
 
 	updateSettings(settings: Pick<Habit, 'name' | 'color' | 'maxSize'>) {
@@ -86,87 +82,36 @@ export class Habit {
 	}
 
 	changeSize(addedSize: number) {
-		const maxSize = 10;
 		const newSize = this.size + addedSize;
 
-		if (newSize > maxSize || newSize < 0) {
+		if (newSize < 0) {
 			return;
 		}
 
-		if (newSize > this.size) {
-			const lastPositiveUpdate = this.getLastPositiveUpdate();
-			const date = new Date();
-
-			if (lastPositiveUpdate.getDate() === date.getDate()) {
-				this._positiveUpdates[this._positiveUpdates.length - 1] = date;
-			} else {
-				this._positiveUpdates.push(date);
-			}
-
-			this._lastUpdate = date;
+		if (
+			(newSize > this.size && newSize <= this.maxSize) ||
+			this.isUpdatedYesterday
+		) {
+			this._habitDate.addPositiveUpdate();
 		}
 
-		this.size = newSize;
+		if (newSize <= this.maxSize) {
+			this.size = newSize;
+		}
 	}
 
-	// этот весь функционал в отдельный класс можно
-	// в целом логики много.. странной...
-
-	decreaseDatedSize() {
-		const todayDate = new Date(new Date().setHours(0, 0, 0, 0));
-
-		if (!this.isDatedSizeDecrease(todayDate)) {
+	decreaseSizeOnload() {
+		if (!this.isAnimateDecrease) {
 			return;
 		}
-		const resultSize = this.calculateDecreaseSizeDated(todayDate);
 
-		this._lastUpdate = todayDate;
-		this.size = resultSize > 0 ? resultSize : 0;
 		this.isAnimateDecrease = false;
+		const resultSize = this.calculateDecreaseSize();
+		this.size = resultSize > 0 ? resultSize : 0;
+		this._habitDate.setLastUpdate();
 	}
 
-	//CLEAN
-	isDatedSizeDecrease(today: Date): boolean {
-		const daysFromLastCheck = this.getDaysBetween(this._lastUpdate, today);
-		const lastPositiveUpdate: Date =
-			this._positiveUpdates[this._positiveUpdates.length - 1]!;
-		const lastPositiveUpdateDay = new Date(lastPositiveUpdate);
-		lastPositiveUpdateDay.setHours(0, 0, 0, 0);
-
-		return (
-			daysFromLastCheck > 0 &&
-			lastPositiveUpdateDay.getTime() + DAY_MS < today.getTime()
-		);
-	}
-
-	// TODO: add tests
-	// TODO: можно будет добавить анимации для уменьшения полосочек только при заходе чтобы понять что упало
-	calculateDecreaseSizeDated(today: Date): number {
-		const daysFromLastCheck = this.getDaysBetween(this._lastUpdate, today);
-		const lastPositiveUpdate: Date =
-			this._positiveUpdates[this._positiveUpdates.length - 1]!;
-		const lastPositiveUpdateDay = new Date(lastPositiveUpdate);
-		lastPositiveUpdateDay.setHours(0, 0, 0, 0);
-
-		const daysBetweenPositive = this.getDaysBetween(
-			lastPositiveUpdateDay,
-			today
-		);
-		let resultSize = this.size;
-
-		// does this make sense?
-		if (daysFromLastCheck === daysBetweenPositive) {
-			resultSize = this.size - (daysFromLastCheck - 1);
-		} else {
-			resultSize = this.size - daysFromLastCheck;
-		}
-
-		this.isAnimateDecrease = true;
-		return resultSize;
-	}
-
-	private getDaysBetween(earlyDate: Date, lateDate: Date) {
-		const timeBetween = lateDate.getTime() - earlyDate.getTime();
-		return Math.trunc(timeBetween / DAY_MS);
+	private calculateDecreaseSize(): number {
+		return this.size - this._habitDate.getDayDifferenceFromLastUpdate();
 	}
 }

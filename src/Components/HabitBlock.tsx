@@ -1,7 +1,7 @@
-import React from 'react';
 import { Habit } from '../Models/Habit';
 import EditPanel from './Panels/EditPanel';
 import HabitSettings from './HabitSettings';
+import { CSSProperties, useState } from 'react';
 
 type HabitProps = {
 	habit: Habit;
@@ -14,31 +14,47 @@ export default function HabitBlock({
 	handleUpdate,
 	handleDelete,
 }: HabitProps) {
-	const [size, setSize] = React.useState(habit.size);
-	const [isEdit, setEditing] = React.useState(false);
+	const [size, setSize] = useState(habit.size);
+	const [isIncreasedToday, setIsIncreasedToday] = useState(
+		habit.isIncreasedToday
+	);
+	const [isEdit, setEditing] = useState(false);
 
 	if (habit.isAnimateDecrease) {
 		window.setTimeout(() => {
-			habit.decreaseDatedSize();
+			habit.decreaseSizeOnload();
 			setSize(habit.size);
-		}, 800);
+		}, 1200);
 	}
 
 	const maxSize = habit.maxSize;
 	const pixelSize = 4.2;
+	let percent = 0;
 
 	const changeSize = (addedSize: number) => {
-		// TODO: REDO
 		const newSize = size + addedSize;
 
-		if (newSize <= maxSize && newSize >= 0) {
+		if (newSize >= 0) {
+			if (newSize <= maxSize) {
+				setSize(newSize);
+			}
+
 			habit.changeSize(addedSize);
-			setSize(newSize);
 			handleUpdate(habit);
+		}
+
+		if (!isIncreasedToday && addedSize > 0) {
+			setIsIncreasedToday(true);
 		}
 	};
 
 	const habitHeight = (size / maxSize) * pixelSize;
+
+	if (habit.isUpdatedYesterday) {
+		const oneUnitHeightPercent = Math.round((1 / maxSize) * 100);
+		percent = oneUnitHeightPercent;
+	}
+
 	return (
 		<div
 			className={`habit-cell ${isEdit ? 'habit-setting' : ''}`}
@@ -61,16 +77,19 @@ export default function HabitBlock({
 					<div className="habit">
 						<div
 							className="habit-block"
-							style={{
-								height: `${habitHeight === 0 ? 0.1 : habitHeight}em`,
-								backgroundColor: habit.color,
-							}}
+							style={
+								{
+									height: `${habitHeight === 0 ? 0.1 : habitHeight}em`,
+									'--habit-color': habit.color,
+									'--percent': `${percent}%`,
+								} as CSSProperties
+							}
 						></div>
 						<span>{size}</span>
 					</div>
 					<div className="size-buttons">
 						<button
-							className="custom-button"
+							className={`custom-button ${isIncreasedToday ? 'increased' : ''}`}
 							onClick={() => changeSize(1)}
 						>
 							⭡

@@ -1,7 +1,7 @@
-import * as React from 'react';
 import { Habit } from '../Models/Habit';
 import Tooltip from './Tooltip';
 import { getRandomColor } from '../utils/utils';
+import { SubmitEvent, useState } from 'react';
 
 type SettingsProps = {
 	onClose: () => void;
@@ -14,9 +14,9 @@ export default function HabitSettings({
 	updateOrCreate,
 	existingHabit,
 }: SettingsProps) {
-	const [name, setName] = React.useState(existingHabit?.name || '');
-	const [size, setSize] = React.useState(existingHabit?.size || '');
-	const [color, setColor] = React.useState(
+	const [name, setName] = useState(existingHabit?.name || '');
+	const [maxSize, setMaxSize] = useState(existingHabit?.maxSize || '');
+	const [color, setColor] = useState(
 		existingHabit?.color || getRandomColor()
 	);
 	let nameError: boolean = false;
@@ -28,24 +28,28 @@ export default function HabitSettings({
 		nameError = false;
 	}
 
-	const sizeNumber = Number(size);
+	const sizeNumber = Number(maxSize);
 	if (Number.isNaN(sizeNumber) || sizeNumber < 0 || sizeNumber > 150) {
 		sizeError = true;
 	} else {
 		sizeError = false;
 	}
 
-	const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
+	const handleSubmit = (e: SubmitEvent<HTMLFormElement>) => {
 		e.preventDefault();
 
-		const maxSize = Number(size) || 5;
+		const newMaxSize = Number(maxSize) || 5;
 		const finalName = name || 'New habit';
 
 		if (existingHabit) {
-			existingHabit.updateSettings({ name: finalName, color, maxSize });
+			existingHabit.updateSettings({
+				name: finalName,
+				color,
+				maxSize: newMaxSize,
+			});
 			updateOrCreate(existingHabit);
 		} else {
-			const newHabit = new Habit(finalName, maxSize, color);
+			const newHabit = new Habit(finalName, newMaxSize, color);
 			updateOrCreate(newHabit);
 		}
 		onClose();
@@ -83,8 +87,8 @@ export default function HabitSettings({
 						name="maxSize"
 						type="text"
 						className={sizeError ? 'error' : ''}
-						value={size}
-						onChange={(e) => setSize(e.target.value)}
+						value={maxSize}
+						onChange={(e) => setMaxSize(e.target.value)}
 					></input>
 					{sizeError ? (
 						<Tooltip>Should be less than 150</Tooltip>

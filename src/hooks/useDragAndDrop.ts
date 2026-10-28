@@ -1,18 +1,16 @@
-import React from 'react';
+import { RefObject, useEffect, useState } from 'react';
+import { isTargetInteractive } from '../utils/utils';
 
 export function useDragAndDrop(
-	containerRef: React.RefObject<HTMLElement | null>,
+	containerRef: RefObject<HTMLElement | null>,
 	onOrderChange: (newIdsOrder: string[]) => void
 ) {
-	const [isHolding, setHolding] = React.useState(false);
-	const [target, setTarget] = React.useState<HTMLElement | null>(null);
+	const [isHolding, setHolding] = useState(false);
+	const [target, setTarget] = useState<HTMLElement | null>(null);
 
-	//перечитать про useref
-	const onOrderChangeRef = React.useRef(onOrderChange);
-	onOrderChangeRef.current = onOrderChange;
-
-	React.useEffect(() => {
+	useEffect(() => {
 		const HOLD_DELAY = 650;
+		let previousClientX = 0;
 		let holdTimeout: number | null = null;
 
 		if (!containerRef.current) {
@@ -51,7 +49,7 @@ export function useDragAndDrop(
 					.map((cell) => cell.dataset.id)
 					.filter(Boolean) as string[];
 
-				onOrderChangeRef.current(newIdsOrder);
+				onOrderChange(newIdsOrder);
 			}
 
 			setHolding(false);
@@ -65,13 +63,17 @@ export function useDragAndDrop(
 			if (!isHolding || !target) return;
 
 			const afterElement: HTMLElement | null = getAfterPointerElement(
-				ev.clientX
+				ev.clientX,
+				previousClientX > ev.clientX,
+				container
 			);
-			if (target && afterElement !== null) {
+			if (afterElement !== null) {
 				container.insertBefore(target, afterElement);
 			} else {
 				container.append(target);
 			}
+
+			previousClientX = ev.clientX;
 		};
 
 		const onExternalDragStart = () => {
@@ -105,14 +107,21 @@ type AfterElement = {
 	element: HTMLElement | null;
 };
 
-function getAfterPointerElement(x: number): HTMLElement | null {
+function getAfterPointerElement(
+	x: number,
+	isLeft: boolean,
+	container: HTMLElement
+): HTMLElement | null {
 	const staticBlocks = Array.from(
-		document.querySelectorAll('.habit-cell:not(.hold)')
+		container.querySelectorAll('.habit-cell:not(.hold)')
 	);
+	const OFFSET_COEFF = 0.3;
+	const sensitivityThreshold = isLeft ? 1 - OFFSET_COEFF : OFFSET_COEFF;
 	const afterPointerElement: AfterElement = staticBlocks.reduce<AfterElement>(
 		(closest, child) => {
 			const box = child.getBoundingClientRect();
-			const offset = x - box.left - box.width / 2;
+			const triggerPoint = box.left + box.width * sensitivityThreshold;
+			const offset = x - triggerPoint;
 
 			if (offset < 0 && offset > closest.offset) {
 				return { offset: offset, element: child as HTMLElement };
@@ -124,9 +133,4 @@ function getAfterPointerElement(x: number): HTMLElement | null {
 	);
 
 	return afterPointerElement.element;
-}
-
-function isTargetInteractive(event: PointerEvent) {
-	const target = event.target as HTMLElement;
-	return target && (target.closest('button') || target.closest('input'));
 }

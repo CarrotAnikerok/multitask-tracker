@@ -31,21 +31,15 @@ export class ReactWidgetChild extends MarkdownRenderChild {
 	loadHabits() {
 		const loadedData = this.onLoadData();
 		if ('habits' in loadedData) {
-			//eslint-disable-next-line no-var -- var have a logic here
 			var loadedHabits = loadedData.habits;
 		} else {
 			loadedHabits = loadedData;
 		}
 
-		const todayDate = new Date(new Date().setHours(0, 0, 0, 0));
-
 		this.initialSettings = loadedData.setting;
 
 		this.initialHabits = loadedHabits.map((raw: RawHabitData) => {
-			const newHabit = Habit.fromRaw(raw);
-			newHabit.calculateDecreaseSizeDated(todayDate);
-
-			return newHabit;
+			return Habit.fromRaw(raw);
 		});
 	}
 

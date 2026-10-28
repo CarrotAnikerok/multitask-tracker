@@ -1,4 +1,3 @@
-import * as React from 'react';
 import HabitBlock from './Components/HabitBlock';
 import HabitSettings from './Components/HabitSettings';
 import { Habit } from './Models/Habit';
@@ -6,6 +5,9 @@ import SortPanel from './Components/Panels/SortPanel';
 import { useScrollOffset } from './hooks/usePointerSpeed';
 import { useDragAndDrop } from './hooks/useDragAndDrop';
 import { SettingData, SortType } from './Models/Settings';
+import { getSortedHabits } from './utils/sortHabits';
+import { useHabitSort } from './hooks/useHabitSort';
+import { useEffect, useRef, useState } from 'react';
 
 type AppProps = {
 	onChangeHabits: (habits: Habit[]) => void;
@@ -20,42 +22,42 @@ export const App = ({
 	onChangeSettings,
 	initialSettings,
 }: AppProps) => {
-	const [habits, setHabits] = React.useState<Habit[]>(initialHabits);
-	const [isHabitCreation, setHabitCreation] = React.useState(false);
-
-	//TODO: move to other component?
-	const [customOrder, setCustomOrder] = React.useState(
-		initialSettings.customOrder
+	const [isHabitCreation, setHabitCreation] = useState(false);
+	const {
+		customOrder,
+		setAndGetCustomSorting,
+		sortType,
+		isIncrease,
+		setAndGetSorting,
+		setCustomOrder,
+	} = useHabitSort(initialSettings);
+	const [habits, setHabits] = useState<Habit[]>(() =>
+		getSortedHabits(initialHabits, customOrder, sortType, isIncrease)
 	);
-	const [sortType, setSortType] = React.useState(initialSettings.sortType);
-	const [isIncrease, setIncrease] = React.useState(
-		initialSettings.isIncrease
-	);
 
-	const changeOrder = (newIdsOrder: string[]) => {
-		setCustomOrder(newIdsOrder);
-		setSortType(SortType.Custom);
-		setHabits((prev) => {
-			const habitMap = new Map(prev.map((h) => [h.id, h]));
-			return newIdsOrder
-				.map((id) => habitMap.get(id))
-				.filter((h): h is Habit => !!h);
-		});
-	};
-
-	React.useEffect(() => {
+	useEffect(() => {
 		onChangeHabits(habits);
 	}, [habits]);
 
-	React.useEffect(() => {
+	useEffect(() => {
 		onChangeSettings({ sortType, customOrder, isIncrease });
 	}, [customOrder, sortType, isIncrease]);
 
-	const containerRef = React.useRef(null);
+	const changeOrder = (newIdsOrder: string[]) => {
+		setHabits((prev) => setAndGetCustomSorting(prev, newIdsOrder));
+	};
+
+	const sortHabits = (sort: SortType, increase: boolean) => {
+		setHabits((prevHabits) =>
+			setAndGetSorting(prevHabits, customOrder, sort, increase)
+		);
+	};
+
+	const containerRef = useRef(null);
 	useDragAndDrop(containerRef, changeOrder);
 	const scrollOffset: number = useScrollOffset(containerRef);
 
-	React.useEffect(() => {
+	useEffect(() => {
 		if (containerRef?.current) {
 			const element: HTMLElement = containerRef.current;
 			element.scrollLeft = scrollOffset;
@@ -66,16 +68,19 @@ export const App = ({
 		setHabits((prev) =>
 			prev.filter((habit) => habit.id !== habitToDelete.id)
 		);
+		setCustomOrder((prev) => prev.filter((id) => id !== habitToDelete.id));
 	};
 
 	const updateHabits = (habitToUpdate: Habit) => {
 		const isHabitExist = habits.some((h) => h.id === habitToUpdate.id);
+
 		if (isHabitExist) {
 			setHabits((prev) =>
 				prev.map((h) => (h.id === habitToUpdate.id ? habitToUpdate : h))
 			);
 		} else {
 			setHabits((prev) => [...prev, habitToUpdate]);
+			setCustomOrder((prev) => [...prev, habitToUpdate.id]);
 		}
 	};
 
@@ -89,12 +94,9 @@ export const App = ({
 			) : (
 				<div className="setting-buttons">
 					<SortPanel
-						setHabits={setHabits}
+						sortHabits={sortHabits}
 						sortType={sortType}
-						setSortType={setSortType}
-						customOrder={customOrder}
 						isIncrease={isIncrease}
-						setIncrease={setIncrease}
 					></SortPanel>
 					<button onClick={() => setHabitCreation(true)}>+</button>
 				</div>

@@ -13,32 +13,30 @@ export default function EditPanel({
 	handleDelete,
 }: EditPanelProps) {
 	return (
-		<div>
-			<FloatingPanel
-				className="habit-setting-button"
-				content={(close) => (
-					<div className="edit-panel-buttons">
-						<button
-							onClick={() => {
-								handleEditing();
-								close();
-							}}
-						>
-							edit
-						</button>
-						<button
-							onClick={() => {
-								handleDelete(habit);
-								close();
-							}}
-						>
-							delete
-						</button>
-					</div>
-				)}
-			>
-				...
-			</FloatingPanel>
-		</div>
+		<FloatingPanel
+			className="habit-setting-button"
+			content={(close) => (
+				<div className="edit-panel-buttons">
+					<button
+						onClick={() => {
+							handleEditing();
+							close();
+						}}
+					>
+						edit
+					</button>
+					<button
+						onClick={() => {
+							handleDelete(habit);
+							close();
+						}}
+					>
+						delete
+					</button>
+				</div>
+			)}
+		>
+			...
+		</FloatingPanel>
 	);
 }
