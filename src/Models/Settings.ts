@@ -17,5 +17,5 @@ export type SettingData = {
 	sortType: SortType;
 	isIncrease: boolean;
 	customOrder: string[];
-	lang: Language
+	lang: Language;
 };

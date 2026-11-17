@@ -102,7 +102,9 @@ export const App = ({
 							sortType={sortType}
 							isIncrease={isIncrease}
 						></SortPanel>
-						<button onClick={() => setHabitCreation(true)}>+</button>
+						<button onClick={() => setHabitCreation(true)}>
+							+
+						</button>
 					</div>
 				)}
 				<div className="cells-container" ref={containerRef}>

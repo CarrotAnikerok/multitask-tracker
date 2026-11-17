@@ -32,14 +32,18 @@ export default function SortPanel({
 					<div className="sort-panel">
 						{getTranslation('sort by', context)}
 						<select value={sortType} onChange={changeType}>
-							<option value={SortType.Custom}>{getTranslation('custom', context)}</option>
+							<option value={SortType.Custom}>
+								{getTranslation('custom', context)}
+							</option>
 							<option value={SortType.Alphabet}>
 								{getTranslation('alphabetical', context)}
 							</option>
 							<option value={SortType.LastUpdated}>
 								{getTranslation('last update', context)}
 							</option>
-							<option value={SortType.Size}>{getTranslation('size', context)}</option>
+							<option value={SortType.Size}>
+								{getTranslation('size', context)}
+							</option>
 						</select>
 						<button onClick={changeIncrease}>
 							{isIncrease ? '↑' : '↓'}

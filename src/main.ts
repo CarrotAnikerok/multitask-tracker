@@ -16,14 +16,14 @@ export default class ExamplePlugin extends Plugin {
 						sortType: 1,
 						customOrder: [],
 						isIncrease: false,
-						lang: Language.en, 
-					}
+						lang: Language.en,
+					},
 				};
 
 				const loadData = (): RawData => {
 					try {
 						if (!source.trim()) {
-							return initialSetting
+							return initialSetting;
 						}
 
 						return JSON.parse(source) as RawData;

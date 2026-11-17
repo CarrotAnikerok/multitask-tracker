@@ -115,7 +115,7 @@
 }
 
 .custom-button.increased {
-	background-color: var(--color-accent) !important;;
+	background-color: var(--color-accent) !important;
 }
 
 /*HABIT SETTING MENU*/
@@ -187,7 +187,7 @@ input {
 }
 
 label::first-letter {
-    text-transform: capitalize;
+	text-transform: capitalize;
 }
 
 /*FLOATING PANELS*/
@@ -251,7 +251,7 @@ label::first-letter {
 	white-space: pre;
 	margin-left: 0.625em;
 	border-radius: var(--radius-s);
-	z-index: 10
+	z-index: 10;
 }
 
 /*TODO: change classes?*/

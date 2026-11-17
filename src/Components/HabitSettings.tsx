@@ -61,7 +61,6 @@ export default function HabitSettings({
 		onClose();
 	};
 
-
 	return (
 		<form className="settings" onSubmit={handleSubmit}>
 			<div className="form-fields">
@@ -75,10 +74,15 @@ export default function HabitSettings({
 						onChange={(e) => setName(e.target.value)}
 					></input>
 					{nameError ? (
-						<Tooltip>{warningText} 18 {getTranslation('symbols', context)}</Tooltip>
+						<Tooltip>
+							{warningText} 18{' '}
+							{getTranslation('symbols', context)}
+						</Tooltip>
 					) : null}
 				</div>
-				<label htmlFor="color">{getTranslation('color', context)}</label>
+				<label htmlFor="color">
+					{getTranslation('color', context)}
+				</label>
 				<div className="color-container">
 					<input
 						name="color"
@@ -88,7 +92,9 @@ export default function HabitSettings({
 						style={{ height: '26px' }}
 					></input>
 				</div>
-				<label htmlFor="maxSize">{getTranslation('size', context)}</label>
+				<label htmlFor="maxSize">
+					{getTranslation('size', context)}
+				</label>
 				<div style={{ position: 'relative' }}>
 					<input
 						name="maxSize"
@@ -97,15 +103,17 @@ export default function HabitSettings({
 						value={maxSize}
 						onChange={(e) => setMaxSize(e.target.value)}
 					></input>
-					{sizeError ? (
-						<Tooltip>{warningText} 150</Tooltip>
-					) : null}
+					{sizeError ? <Tooltip>{warningText} 150</Tooltip> : null}
 				</div>
 			</div>
 			<div style={{ display: 'flex', gap: '5px' }}>
-				<button onClick={() => onClose()}>{getTranslation('cancel', context)}</button>
+				<button onClick={() => onClose()}>
+					{getTranslation('cancel', context)}
+				</button>
 				<button type="submit" disabled={nameError || sizeError}>
-					{existingHabit ? getTranslation('update', context) : getTranslation('create', context)}
+					{existingHabit
+						? getTranslation('update', context)
+						: getTranslation('create', context)}
 				</button>
 			</div>
 		</form>

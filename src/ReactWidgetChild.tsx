@@ -17,7 +17,7 @@ export class ReactWidgetChild extends MarkdownRenderChild {
 		sortType: 1,
 		customOrder: [],
 		isIncrease: false,
-		lang: Language.en, 
+		lang: Language.en,
 	};
 
 	constructor(
