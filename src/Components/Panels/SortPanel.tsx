@@ -1,6 +1,8 @@
 import FloatingPanel from './FloatingPanel';
 import { SortType } from '../../Models/Settings';
-import { ChangeEvent } from 'react';
+import { ChangeEvent, useContext } from 'react';
+import { LanguageContext } from '../../utils/Contexts';
+import { getTranslation } from '../../utils/translator';
 
 type SortPanelProps = {
 	sortHabits: (sort: SortType, increase: boolean) => void;
@@ -13,6 +15,7 @@ export default function SortPanel({
 	sortType,
 	isIncrease,
 }: SortPanelProps) {
+	const context = useContext(LanguageContext);
 	const changeType = (event: ChangeEvent<HTMLSelectElement>) => {
 		const sortValue = Number(event.target.value);
 		sortHabits(sortValue, isIncrease);
@@ -27,16 +30,16 @@ export default function SortPanel({
 			<FloatingPanel
 				content={() => (
 					<div className="sort-panel">
-						Sort by
+						{getTranslation('sort by', context)}
 						<select value={sortType} onChange={changeType}>
-							<option value={SortType.Custom}>custom</option>
+							<option value={SortType.Custom}>{getTranslation('custom', context)}</option>
 							<option value={SortType.Alphabet}>
-								alphabetical
+								{getTranslation('alphabetical', context)}
 							</option>
 							<option value={SortType.LastUpdated}>
-								last update
+								{getTranslation('last update', context)}
 							</option>
-							<option value={SortType.Size}>size</option>
+							<option value={SortType.Size}>{getTranslation('size', context)}</option>
 						</select>
 						<button onClick={changeIncrease}>
 							{isIncrease ? '↑' : '↓'}

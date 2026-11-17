@@ -79,6 +79,10 @@ export class Habit {
 		this.name = settings.name;
 		this.color = settings.color;
 		this.maxSize = settings.maxSize;
+
+		if (this.size > this.maxSize) {
+			this.size = this.maxSize;
+		}
 	}
 
 	changeSize(addedSize: number) {

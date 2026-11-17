@@ -8,6 +8,8 @@ import { SettingData, SortType } from './Models/Settings';
 import { getSortedHabits } from './utils/sortHabits';
 import { useHabitSort } from './hooks/useHabitSort';
 import { useEffect, useRef, useState } from 'react';
+import { LanguageContext } from './utils/Contexts';
+import { Language } from './utils/translator';
 
 type AppProps = {
 	onChangeHabits: (habits: Habit[]) => void;
@@ -22,6 +24,7 @@ export const App = ({
 	onChangeSettings,
 	initialSettings,
 }: AppProps) => {
+	const [language] = useState(initialSettings.lang || Language.en);
 	const [isHabitCreation, setHabitCreation] = useState(false);
 	const {
 		customOrder,
@@ -40,8 +43,8 @@ export const App = ({
 	}, [habits]);
 
 	useEffect(() => {
-		onChangeSettings({ sortType, customOrder, isIncrease });
-	}, [customOrder, sortType, isIncrease]);
+		onChangeSettings({ sortType, customOrder, isIncrease, lang: language });
+	}, [customOrder, sortType, isIncrease, language]);
 
 	const changeOrder = (newIdsOrder: string[]) => {
 		setHabits((prev) => setAndGetCustomSorting(prev, newIdsOrder));
@@ -85,34 +88,36 @@ export const App = ({
 	};
 
 	return (
-		<div className="app-container">
-			{isHabitCreation ? (
-				<HabitSettings
-					onClose={() => setHabitCreation(false)}
-					updateOrCreate={updateHabits}
-				></HabitSettings>
-			) : (
-				<div className="setting-buttons">
-					<SortPanel
-						sortHabits={sortHabits}
-						sortType={sortType}
-						isIncrease={isIncrease}
-					></SortPanel>
-					<button onClick={() => setHabitCreation(true)}>+</button>
+		<LanguageContext value={language}>
+			<div className="mult-app-container">
+				{isHabitCreation ? (
+					<HabitSettings
+						onClose={() => setHabitCreation(false)}
+						updateOrCreate={updateHabits}
+					></HabitSettings>
+				) : (
+					<div className="setting-buttons">
+						<SortPanel
+							sortHabits={sortHabits}
+							sortType={sortType}
+							isIncrease={isIncrease}
+						></SortPanel>
+						<button onClick={() => setHabitCreation(true)}>+</button>
+					</div>
+				)}
+				<div className="cells-container" ref={containerRef}>
+					{habits.map((habit) => {
+						return (
+							<HabitBlock
+								key={habit.id}
+								habit={habit}
+								handleUpdate={updateHabits}
+								handleDelete={deleteHabit}
+							></HabitBlock>
+						);
+					})}
 				</div>
-			)}
-			<div className="cells-container" ref={containerRef}>
-				{habits.map((habit) => {
-					return (
-						<HabitBlock
-							key={habit.id}
-							habit={habit}
-							handleUpdate={updateHabits}
-							handleDelete={deleteHabit}
-						></HabitBlock>
-					);
-				})}
 			</div>
-		</div>
+		</LanguageContext>
 	);
 };

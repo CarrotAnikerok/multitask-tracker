@@ -1,5 +1,5 @@
 /*MAIN*/
-.app-container {
+.mult-app-container {
 	display: flex;
 	flex-direction: row;
 }
@@ -24,7 +24,6 @@
 	margin-right: 0.5em;
 	margin-left: 1em;
 	place-self: center;
-	font-family: var(--font-monospace-default);
 	display: flex;
 	flex-direction: column;
 	gap: 0.5em;
@@ -36,8 +35,6 @@
 	display: grid;
 	grid-template-rows: subgrid;
 	grid-row: span 4;
-
-	font-family: var(--font-monospace-default);
 	touch-action: none;
 }
 
@@ -118,7 +115,7 @@
 }
 
 .custom-button.increased {
-	background-color: var(--color-accent);
+	background-color: var(--color-accent) !important;;
 }
 
 /*HABIT SETTING MENU*/
@@ -128,7 +125,6 @@
 	grid-column: span 3;
 	place-self: center;
 	background-color: var(--background-primary-alt);
-	font-family: var(--font-text);
 
 	display: flex;
 	gap: 5px;
@@ -190,6 +186,10 @@ input {
 	width: 5em;
 }
 
+label::first-letter {
+    text-transform: capitalize;
+}
+
 /*FLOATING PANELS*/
 
 .panel-trigger {
@@ -199,7 +199,6 @@ input {
 }
 
 .floating-panel {
-	font-family: var(--font-monospace-default);
 	width: auto;
 	height: auto;
 	pointer-events: auto;
@@ -252,6 +251,7 @@ input {
 	white-space: pre;
 	margin-left: 0.625em;
 	border-radius: var(--radius-s);
+	z-index: 10
 }
 
 /*TODO: change classes?*/

@@ -62,7 +62,7 @@ export default function HabitBlock({
 		>
 			{isEdit ? (
 				<HabitSettings
-					onClose={() => setEditing(false)}
+					onClose={() => {setEditing(false); setSize(habit.size)}}
 					updateOrCreate={handleUpdate}
 					existingHabit={habit}
 				></HabitSettings>

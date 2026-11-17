@@ -2,6 +2,7 @@ import { Plugin } from 'obsidian';
 import { Habit } from './Models/Habit';
 import { ReactWidgetChild } from './ReactWidgetChild';
 import { RawData, SettingData } from './Models/Settings';
+import { Language } from './utils/translator';
 
 export default class ExamplePlugin extends Plugin {
 	async onload() {
@@ -9,18 +10,20 @@ export default class ExamplePlugin extends Plugin {
 			'multitask',
 			(source, el, ctx) => {
 				const container = el.createDiv();
+				const initialSetting = {
+					habits: [],
+					setting: {
+						sortType: 1,
+						customOrder: [],
+						isIncrease: false,
+						lang: Language.en, 
+					}
+				};
 
 				const loadData = (): RawData => {
 					try {
 						if (!source.trim()) {
-							return {
-								habits: [],
-								setting: {
-									sortType: 1,
-									customOrder: [],
-									isIncrease: false,
-								},
-							};
+							return initialSetting
 						}
 
 						return JSON.parse(source) as RawData;
@@ -29,14 +32,7 @@ export default class ExamplePlugin extends Plugin {
 							'Parsing error JSON in multitask code-block:',
 							e
 						);
-						return {
-							habits: [],
-							setting: {
-								sortType: 1,
-								customOrder: [],
-								isIncrease: false,
-							},
-						};
+						return initialSetting;
 					}
 				};
 

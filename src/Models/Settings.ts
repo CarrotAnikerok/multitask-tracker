@@ -1,3 +1,4 @@
+import { Language } from '../utils/translator';
 import { RawHabitData } from './Habit';
 
 export type RawData = {
@@ -16,4 +17,5 @@ export type SettingData = {
 	sortType: SortType;
 	isIncrease: boolean;
 	customOrder: string[];
+	lang: Language
 };

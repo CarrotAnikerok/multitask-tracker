@@ -1,7 +1,9 @@
 import { Habit } from '../Models/Habit';
 import Tooltip from './Tooltip';
 import { getRandomColor } from '../utils/utils';
-import { SubmitEvent, useState } from 'react';
+import { SubmitEvent, useContext, useState } from 'react';
+import { LanguageContext } from '../utils/Contexts';
+import { getTranslation } from '../utils/translator';
 
 type SettingsProps = {
 	onClose: () => void;
@@ -22,6 +24,10 @@ export default function HabitSettings({
 	let nameError: boolean = false;
 	let sizeError: boolean = false;
 
+	const context = useContext(LanguageContext);
+	const habitText = getTranslation('New habit', context);
+	const warningText = getTranslation('should be less than', context);
+
 	if (name.length > 18) {
 		nameError = true;
 	} else {
@@ -39,7 +45,7 @@ export default function HabitSettings({
 		e.preventDefault();
 
 		const newMaxSize = Number(maxSize) || 5;
-		const finalName = name || 'New habit';
+		const finalName = name || habitText;
 
 		if (existingHabit) {
 			existingHabit.updateSettings({
@@ -55,10 +61,11 @@ export default function HabitSettings({
 		onClose();
 	};
 
+
 	return (
 		<form className="settings" onSubmit={handleSubmit}>
 			<div className="form-fields">
-				<label htmlFor="name">Имя</label>
+				<label htmlFor="name">{getTranslation('name', context)}</label>
 				<div style={{ position: 'relative' }}>
 					<input
 						name="name"
@@ -68,10 +75,10 @@ export default function HabitSettings({
 						onChange={(e) => setName(e.target.value)}
 					></input>
 					{nameError ? (
-						<Tooltip>Should be less than 18 symbols</Tooltip>
+						<Tooltip>{warningText} 18 {getTranslation('symbols', context)}</Tooltip>
 					) : null}
 				</div>
-				<label htmlFor="color">Цвет</label>
+				<label htmlFor="color">{getTranslation('color', context)}</label>
 				<div className="color-container">
 					<input
 						name="color"
@@ -81,7 +88,7 @@ export default function HabitSettings({
 						style={{ height: '26px' }}
 					></input>
 				</div>
-				<label htmlFor="maxSize">Размер</label>
+				<label htmlFor="maxSize">{getTranslation('size', context)}</label>
 				<div style={{ position: 'relative' }}>
 					<input
 						name="maxSize"
@@ -91,14 +98,14 @@ export default function HabitSettings({
 						onChange={(e) => setMaxSize(e.target.value)}
 					></input>
 					{sizeError ? (
-						<Tooltip>Should be less than 150</Tooltip>
+						<Tooltip>{warningText} 150</Tooltip>
 					) : null}
 				</div>
 			</div>
 			<div style={{ display: 'flex', gap: '5px' }}>
-				<button onClick={() => onClose()}>Cancel</button>
+				<button onClick={() => onClose()}>{getTranslation('cancel', context)}</button>
 				<button type="submit" disabled={nameError || sizeError}>
-					{existingHabit ? 'Update' : 'Create'}
+					{existingHabit ? getTranslation('update', context) : getTranslation('create', context)}
 				</button>
 			</div>
 		</form>
