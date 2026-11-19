@@ -18,7 +18,9 @@ export default function HabitSettings({
 }: SettingsProps) {
 	const [name, setName] = useState(existingHabit?.name || '');
 	const [maxSize, setMaxSize] = useState(existingHabit?.maxSize || '5');
-	const [fallDayStep, setFallDayStep] = useState(existingHabit?.fallDayStep || '1');
+	const [fallDayStep, setFallDayStep] = useState(
+		existingHabit?.fallDayStep || '1'
+	);
 	const [color, setColor] = useState(
 		existingHabit?.color || getRandomColor()
 	);
@@ -54,11 +56,16 @@ export default function HabitSettings({
 				name: finalName,
 				color,
 				maxSize: newMaxSize,
-				fallDayStep: newFallDayStep
+				fallDayStep: newFallDayStep,
 			});
 			updateOrCreate(existingHabit);
 		} else {
-			const newHabit = new Habit(finalName, newMaxSize, color, newFallDayStep);
+			const newHabit = new Habit(
+				finalName,
+				newMaxSize,
+				color,
+				newFallDayStep
+			);
 			updateOrCreate(newHabit);
 		}
 		onClose();

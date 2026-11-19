@@ -40,7 +40,9 @@ export class Habit {
 		this.fallDayStep = fallDayStep;
 		this.id = id ? id : generateCode();
 		this._habitDate = new HabitTimeline(positiveDates, lastUpdate);
-		this.isAnimateDecrease = this._habitDate.isShouldDecrease(this.fallDayStep);
+		this.isAnimateDecrease = this._habitDate.isShouldDecrease(
+			this.fallDayStep
+		);
 	}
 
 	static fromRaw(raw: RawHabitData): Habit {
@@ -52,7 +54,7 @@ export class Habit {
 			raw.size,
 			raw.id,
 			raw.positiveUpdates,
-			raw.lastUpdate,
+			raw.lastUpdate
 		);
 	}
 
@@ -84,7 +86,9 @@ export class Habit {
 		};
 	}
 
-	updateSettings(settings: Pick<Habit, 'name' | 'color' | 'maxSize' | 'fallDayStep'>) {
+	updateSettings(
+		settings: Pick<Habit, 'name' | 'color' | 'maxSize' | 'fallDayStep'>
+	) {
 		this.name = settings.name;
 		this.color = settings.color;
 		this.maxSize = settings.maxSize;

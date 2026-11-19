@@ -59,7 +59,8 @@ export class HabitTimeline {
 		);
 		return (
 			//why checking for positive update anyway, if lat update should be newer ir equal?
-			this._daysFromLastUpdate >= fallDayStep  && this.isPositiveUpdateOlderThanFallStep(fallDayStep)
+			this._daysFromLastUpdate >= fallDayStep &&
+			this.isPositiveUpdateOlderThanFallStep(fallDayStep)
 		);
 	}
 
