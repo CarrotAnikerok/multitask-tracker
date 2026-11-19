@@ -20,6 +20,8 @@ const translations: Partial<Record<Language, Record<string, string>>> = {
 		'last update': 'обновление',
 		alphabetical: 'алфавит',
 		'New habit': 'Занятие',
+		// TODO: think of better name
+		'drop': `шаг`
 	},
 };
 

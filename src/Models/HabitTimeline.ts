@@ -27,14 +27,6 @@ export class HabitTimeline {
 		return this._lastUpdate.toISOString();
 	}
 
-	get isUpdatedYesterday(): boolean {
-		return (
-			!this.isUpdateOlderThanYesterday() &&
-			this.getLastPositiveUpdate().getTime() <
-				this._currentLoadDay.getTime()
-		);
-	}
-
 	get isIncreasedToday(): boolean {
 		return (
 			this.getLastPositiveUpdate().toDateString() ===
@@ -60,13 +52,14 @@ export class HabitTimeline {
 		this._lastUpdate = new Date();
 	}
 
-	isShouldDecrease(): boolean {
+	isShouldDecrease(fallDayStep: number): boolean {
 		this._daysFromLastUpdate = this.getDaysBetween(
 			this._lastUpdate,
 			this._currentLoadDay
 		);
 		return (
-			this._daysFromLastUpdate > 0 && this.isUpdateOlderThanYesterday()
+			//why checking for positive update anyway, if lat update should be newer ir equal?
+			this._daysFromLastUpdate >= fallDayStep  && this.isPositiveUpdateOlderThanFallStep(fallDayStep)
 		);
 	}
 
@@ -100,9 +93,9 @@ export class HabitTimeline {
 		return lastPositiveUpdate;
 	}
 
-	private isUpdateOlderThanYesterday(): boolean {
+	private isPositiveUpdateOlderThanFallStep(fallDayStep: number): boolean {
 		return (
-			this.getLastPositiveUpdate().getTime() + DAY_MS <
+			this.getLastPositiveUpdate().getTime() + DAY_MS * fallDayStep <
 			this._currentLoadDay.getTime()
 		);
 	}
@@ -116,5 +109,14 @@ export class HabitTimeline {
 		const startDate = new Date(date);
 		startDate.setHours(0, 0, 0, 0);
 		return startDate;
+	}
+
+	isUpdatedRecently(fallDayStep: number): boolean {
+		return (
+			!this.isPositiveUpdateOlderThanFallStep(fallDayStep) &&
+			//chek if last positive update didnt happen today
+			this.getLastPositiveUpdate().getTime() <
+				this._currentLoadDay.getTime()
+		);
 	}
 }

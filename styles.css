@@ -77,7 +77,9 @@
 .name {
 	font-size: 0.7em;
 	place-self: center center;
-	word-break: break-all;
+	word-break: normal;
+	overflow-wrap: break-word;
+	white-space: pre-wrap;
 }
 
 .habit {
@@ -130,7 +132,7 @@
 	gap: 5px;
 	flex-direction: column;
 	font-size: var(--font-ui-smaller);
-	padding: 15px;
+	padding: 10px;
 	border-radius: var(--radius-s);
 }
 
@@ -161,6 +163,7 @@
 
 .form-fields input {
 	width: 6em;
+	height: 22px;
 }
 
 .form-fields .error {

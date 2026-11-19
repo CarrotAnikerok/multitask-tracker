@@ -17,7 +17,8 @@ export default function HabitSettings({
 	existingHabit,
 }: SettingsProps) {
 	const [name, setName] = useState(existingHabit?.name || '');
-	const [maxSize, setMaxSize] = useState(existingHabit?.maxSize || '');
+	const [maxSize, setMaxSize] = useState(existingHabit?.maxSize || '5');
+	const [fallDayStep, setFallDayStep] = useState(existingHabit?.fallDayStep || '1');
 	const [color, setColor] = useState(
 		existingHabit?.color || getRandomColor()
 	);
@@ -45,6 +46,7 @@ export default function HabitSettings({
 		e.preventDefault();
 
 		const newMaxSize = Number(maxSize) || 5;
+		const newFallDayStep = Number(fallDayStep) || 1;
 		const finalName = name || habitText;
 
 		if (existingHabit) {
@@ -52,10 +54,11 @@ export default function HabitSettings({
 				name: finalName,
 				color,
 				maxSize: newMaxSize,
+				fallDayStep: newFallDayStep
 			});
 			updateOrCreate(existingHabit);
 		} else {
-			const newHabit = new Habit(finalName, newMaxSize, color);
+			const newHabit = new Habit(finalName, newMaxSize, color, newFallDayStep);
 			updateOrCreate(newHabit);
 		}
 		onClose();
@@ -89,7 +92,7 @@ export default function HabitSettings({
 						type="color"
 						value={color}
 						onChange={(e) => setColor(e.target.value)}
-						style={{ height: '26px' }}
+						style={{ width: '2em' }}
 					></input>
 				</div>
 				<label htmlFor="maxSize">
@@ -105,9 +108,23 @@ export default function HabitSettings({
 					></input>
 					{sizeError ? <Tooltip>{warningText} 150</Tooltip> : null}
 				</div>
+				<label htmlFor="fallDayStep">
+					{getTranslation('drop', context)}
+				</label>
+				<div style={{ position: 'relative' }}>
+					<input
+						name="fallDayStep"
+						type="text"
+						//change
+						className={sizeError ? 'error' : ''}
+						value={fallDayStep}
+						onChange={(e) => setFallDayStep(e.target.value)}
+					></input>
+					{sizeError ? <Tooltip>{warningText} 150</Tooltip> : null}
+				</div>
 			</div>
 			<div style={{ display: 'flex', gap: '5px' }}>
-				<button onClick={() => onClose()}>
+				<button onClick={() => onClose()} type="button">
 					{getTranslation('cancel', context)}
 				</button>
 				<button type="submit" disabled={nameError || sizeError}>
