@@ -1,7 +1,9 @@
 import { Habit } from '../Models/Habit';
 import EditPanel from './Panels/EditPanel';
 import HabitSettings from './HabitSettings';
-import { CSSProperties, useState } from 'react';
+import { CSSProperties, useContext, useState } from 'react';
+import { LanguageContext } from '../utils/Contexts';
+import { getTranslation } from '../utils/translator';
 
 type HabitProps = {
 	habit: Habit;
@@ -55,6 +57,13 @@ export default function HabitBlock({
 		percent = oneUnitHeightPercent;
 	}
 
+	// TODO: move somewhere else
+	const rtf = new Intl.RelativeTimeFormat('ru', { numeric: 'auto' });
+	const context = useContext(LanguageContext);
+	const lastUpdatedText = getTranslation('Updated {date}, {days}', context)
+		.replace('{date}', habit.lastUpdate.toLocaleDateString(context))
+		.replace('{days}', rtf.format(-habit.daysFromLastUpdate, 'day'));
+
 	return (
 		<div
 			className={`habit-cell ${isEdit ? 'habit-setting' : ''}`}
@@ -77,7 +86,7 @@ export default function HabitBlock({
 						handleDelete={handleDelete}
 					></EditPanel>
 					<span className="name">{habit.name}</span>
-					<div className="habit">
+					<div className="habit" title={lastUpdatedText}>
 						<div
 							className="habit-block"
 							style={

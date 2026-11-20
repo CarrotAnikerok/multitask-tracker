@@ -22,6 +22,7 @@ const translations: Partial<Record<Language, Record<string, string>>> = {
 		'New habit': 'Занятие',
 		// TODO: think of better name
 		drop: `шаг`,
+		'Updated {date}, {days}': 'Обновлено {date}, {days}',
 	},
 };
 

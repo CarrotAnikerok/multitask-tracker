@@ -69,6 +69,14 @@ export class Habit {
 		return this._habitDate.isIncreasedToday;
 	}
 
+	get lastUpdate() {
+		return this._habitDate.lastUpdate;
+	}
+
+	get daysFromLastUpdate() {
+		return this._habitDate.daysFromLastUpdate;
+	}
+
 	getLastPositiveUpdate() {
 		return this._habitDate.getLastPositiveUpdate();
 	}
@@ -82,7 +90,7 @@ export class Habit {
 			size: this.size,
 			color: this.color,
 			positiveUpdates: this._habitDate.positiveUpdates,
-			lastUpdate: this._habitDate.lastUpdate,
+			lastUpdate: this._habitDate.lastUpdate.toISOString(),
 		};
 	}
 

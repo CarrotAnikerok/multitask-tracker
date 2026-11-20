@@ -23,8 +23,12 @@ export class HabitTimeline {
 		return this._positiveUpdates.map((u) => u.toISOString());
 	}
 
-	get lastUpdate() {
-		return this._lastUpdate.toISOString();
+	get lastUpdate(): Date {
+		return this._lastUpdate;
+	}
+
+	get daysFromLastUpdate(): number {
+		return this._daysFromLastUpdate;
 	}
 
 	get isIncreasedToday(): boolean {
@@ -94,6 +98,14 @@ export class HabitTimeline {
 		return lastPositiveUpdate;
 	}
 
+	isUpdatedRecently(fallDayStep: number): boolean {
+		return (
+			!this.isPositiveUpdateOlderThanFallStep(fallDayStep) &&
+			this.getLastPositiveUpdate().getTime() <
+				this._currentLoadDay.getTime()
+		);
+	}
+
 	private isPositiveUpdateOlderThanFallStep(fallDayStep: number): boolean {
 		return (
 			this.getLastPositiveUpdate().getTime() + DAY_MS * fallDayStep <
@@ -101,23 +113,15 @@ export class HabitTimeline {
 		);
 	}
 
+	//test! Math.trunc is sus here
 	private getDaysBetween(earlyDate: Date, lateDate: Date): number {
 		const timeBetween = lateDate.getTime() - earlyDate.getTime();
-		return Math.trunc(timeBetween / DAY_MS);
+		return timeBetween > 0 ? Math.trunc(timeBetween / DAY_MS) + 1 : 0;
 	}
 
 	private getDateStart(date: Date) {
 		const startDate = new Date(date);
 		startDate.setHours(0, 0, 0, 0);
 		return startDate;
-	}
-
-	isUpdatedRecently(fallDayStep: number): boolean {
-		return (
-			!this.isPositiveUpdateOlderThanFallStep(fallDayStep) &&
-			//chek if last positive update didnt happen today
-			this.getLastPositiveUpdate().getTime() <
-				this._currentLoadDay.getTime()
-		);
 	}
 }
