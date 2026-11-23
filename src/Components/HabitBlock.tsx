@@ -53,8 +53,12 @@ export default function HabitBlock({
 	const habitHeight = (size / maxSize) * pixelSize;
 
 	if (habit.isUpdatedRecently) {
-		const oneUnitHeightPercent = Math.round((1 / maxSize) * 100);
-		percent = oneUnitHeightPercent;
+		const growCoefficient = 10;
+		const oneUnitHeightPercent =
+			maxSize < 15
+				? Math.round((1 / size) * 100)
+				: (maxSize / size) * growCoefficient;
+		percent = oneUnitHeightPercent > 50 ? 50 : oneUnitHeightPercent;
 	}
 
 	// TODO: move somewhere else
