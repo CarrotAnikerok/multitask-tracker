@@ -1,7 +1,7 @@
 {
 	"id": "multitask-tracker",
 	"name": "Multitask Tracker",
-	"version": "1.0.0",
+	"version": "0.2.0",
 	"minAppVersion": "1.10.0",
 	"description": "Keep track of your numerous activities with intuitive visuals and understand which of them require your attention the most.",
 	"author": "Obsidian",
