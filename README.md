@@ -2,7 +2,7 @@
 
 Do you have a lot of interests that you want to keep track of to get a full picture what you are doing? Are you tired of forgetting about your various hobbies? Then this plugin for [Obsidian](https://obsidian.md/) is exactly what you need!
 
-![Multitask Tracker Example](screenshots/multitask_example.png)
+![Multitask Tracker Example](screenshots/multitask_example.gif)
 
 ## What it does
 
