@@ -3,6 +3,7 @@ import { createRoot, Root } from 'react-dom/client';
 import { App } from './App';
 import { Habit, RawHabitData } from './Models/Habit';
 import { RawData, SettingData } from './Models/Settings';
+import { Language } from './utils/translator';
 
 export class ReactWidgetChild extends MarkdownRenderChild {
 	private root: Root | null = null;
@@ -16,6 +17,7 @@ export class ReactWidgetChild extends MarkdownRenderChild {
 		sortType: 1,
 		customOrder: [],
 		isIncrease: false,
+		lang: Language.en,
 	};
 
 	constructor(

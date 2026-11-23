@@ -1,7 +1,9 @@
 import { Habit } from '../Models/Habit';
 import EditPanel from './Panels/EditPanel';
 import HabitSettings from './HabitSettings';
-import { CSSProperties, useState } from 'react';
+import { CSSProperties, useContext, useState } from 'react';
+import { LanguageContext } from '../utils/Contexts';
+import { getTranslation } from '../utils/translator';
 
 type HabitProps = {
 	habit: Habit;
@@ -50,10 +52,21 @@ export default function HabitBlock({
 
 	const habitHeight = (size / maxSize) * pixelSize;
 
-	if (habit.isUpdatedYesterday) {
-		const oneUnitHeightPercent = Math.round((1 / maxSize) * 100);
-		percent = oneUnitHeightPercent;
+	if (habit.isUpdatedRecently) {
+		const growCoefficient = 10;
+		const oneUnitHeightPercent =
+			maxSize < 15
+				? Math.round((1 / size) * 100)
+				: (maxSize / size) * growCoefficient;
+		percent = oneUnitHeightPercent > 50 ? 50 : oneUnitHeightPercent;
 	}
+
+	// TODO: move somewhere else
+	const rtf = new Intl.RelativeTimeFormat('ru', { numeric: 'auto' });
+	const context = useContext(LanguageContext);
+	const lastUpdatedText = getTranslation('Updated {date}, {days}', context)
+		.replace('{date}', habit.lastUpdate.toLocaleDateString(context))
+		.replace('{days}', rtf.format(-habit.daysFromLastUpdate, 'day'));
 
 	return (
 		<div
@@ -62,7 +75,10 @@ export default function HabitBlock({
 		>
 			{isEdit ? (
 				<HabitSettings
-					onClose={() => setEditing(false)}
+					onClose={() => {
+						setEditing(false);
+						setSize(habit.size);
+					}}
 					updateOrCreate={handleUpdate}
 					existingHabit={habit}
 				></HabitSettings>
@@ -74,7 +90,7 @@ export default function HabitBlock({
 						handleDelete={handleDelete}
 					></EditPanel>
 					<span className="name">{habit.name}</span>
-					<div className="habit">
+					<div className="habit" title={lastUpdatedText}>
 						<div
 							className="habit-block"
 							style={

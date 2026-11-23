@@ -6,6 +6,7 @@ export type RawHabitData = {
 	name: string;
 	maxSize: number;
 	size: number;
+	fallDayStep: number;
 	color: string;
 	positiveUpdates: string[];
 	lastUpdate: string;
@@ -16,6 +17,7 @@ export class Habit {
 	name: string;
 	color: string;
 
+	fallDayStep: number = 1;
 	size: number = 10;
 	maxSize: number = 10;
 	isAnimateDecrease: boolean;
@@ -25,6 +27,7 @@ export class Habit {
 		name: string,
 		maxSize: number,
 		color: string,
+		fallDayStep: number,
 		size?: number,
 		id?: string,
 		positiveDates?: string[],
@@ -34,9 +37,12 @@ export class Habit {
 		this.size = size || size === 0 ? size : maxSize;
 		this.color = color;
 		this.maxSize = maxSize;
+		this.fallDayStep = fallDayStep;
 		this.id = id ? id : generateCode();
 		this._habitDate = new HabitTimeline(positiveDates, lastUpdate);
-		this.isAnimateDecrease = this._habitDate.isShouldDecrease();
+		this.isAnimateDecrease = this._habitDate.isShouldDecrease(
+			this.fallDayStep
+		);
 	}
 
 	static fromRaw(raw: RawHabitData): Habit {
@@ -44,6 +50,7 @@ export class Habit {
 			raw.name,
 			raw.maxSize,
 			raw.color,
+			raw.fallDayStep,
 			raw.size,
 			raw.id,
 			raw.positiveUpdates,
@@ -51,12 +58,23 @@ export class Habit {
 		);
 	}
 
-	get isUpdatedYesterday() {
-		return this._habitDate.isUpdatedYesterday;
+	/**
+	 * Is updated not today, but first drop didn't happen
+	 */
+	get isUpdatedRecently() {
+		return this._habitDate.isUpdatedRecently(this.fallDayStep);
 	}
 
 	get isIncreasedToday() {
 		return this._habitDate.isIncreasedToday;
+	}
+
+	get lastUpdate() {
+		return this._habitDate.lastUpdate;
+	}
+
+	get daysFromLastUpdate() {
+		return this._habitDate.daysFromLastUpdate;
 	}
 
 	getLastPositiveUpdate() {
@@ -68,17 +86,25 @@ export class Habit {
 			id: this.id,
 			name: this.name,
 			maxSize: this.maxSize,
+			fallDayStep: this.fallDayStep,
 			size: this.size,
 			color: this.color,
 			positiveUpdates: this._habitDate.positiveUpdates,
-			lastUpdate: this._habitDate.lastUpdate,
+			lastUpdate: this._habitDate.lastUpdate.toISOString(),
 		};
 	}
 
-	updateSettings(settings: Pick<Habit, 'name' | 'color' | 'maxSize'>) {
+	updateSettings(
+		settings: Pick<Habit, 'name' | 'color' | 'maxSize' | 'fallDayStep'>
+	) {
 		this.name = settings.name;
 		this.color = settings.color;
 		this.maxSize = settings.maxSize;
+		this.fallDayStep = settings.fallDayStep;
+
+		if (this.size > this.maxSize) {
+			this.size = this.maxSize;
+		}
 	}
 
 	changeSize(addedSize: number) {
@@ -90,7 +116,7 @@ export class Habit {
 
 		if (
 			(newSize > this.size && newSize <= this.maxSize) ||
-			this.isUpdatedYesterday
+			this.isUpdatedRecently
 		) {
 			this._habitDate.addPositiveUpdate();
 		}

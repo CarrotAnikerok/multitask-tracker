@@ -1,5 +1,8 @@
+import { useContext } from 'react';
 import { Habit } from '../../Models/Habit';
+import { getTranslation } from '../../utils/translator';
 import FloatingPanel from './FloatingPanel';
+import { LanguageContext } from '../../utils/Contexts';
 
 type EditPanelProps = {
 	habit: Habit;
@@ -23,7 +26,7 @@ export default function EditPanel({
 							close();
 						}}
 					>
-						edit
+						{getTranslation('edit', useContext(LanguageContext))}
 					</button>
 					<button
 						onClick={() => {
@@ -31,7 +34,7 @@ export default function EditPanel({
 							close();
 						}}
 					>
-						delete
+						{getTranslation('delete', useContext(LanguageContext))}
 					</button>
 				</div>
 			)}
