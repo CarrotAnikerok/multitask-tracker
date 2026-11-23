@@ -62,11 +62,14 @@ export default function HabitBlock({
 	}
 
 	// TODO: move somewhere else
-	const rtf = new Intl.RelativeTimeFormat('ru', { numeric: 'auto' });
 	const context = useContext(LanguageContext);
+	const rtf = new Intl.RelativeTimeFormat(context, { numeric: 'auto' });
 	const lastUpdatedText = getTranslation('Updated {date}, {days}', context)
-		.replace('{date}', habit.lastUpdate.toLocaleDateString(context))
-		.replace('{days}', rtf.format(-habit.daysFromLastUpdate, 'day'));
+		.replace(
+			'{date}',
+			habit.getLastPositiveUpdate().toLocaleDateString(context)
+		)
+		.replace('{days}', rtf.format(-habit.daysFromPositiveUpdate, 'day'));
 
 	return (
 		<div

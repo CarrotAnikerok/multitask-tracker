@@ -5,7 +5,6 @@ const DAY_MS = 24 * 3600 * 1000;
  * Not working with date changing in realtime. Define behavior by calculating difference between load day and update days.
  */
 export class HabitTimeline {
-	private _daysFromLastUpdate: number = 0;
 	private _positiveUpdates: Date[];
 	private _lastUpdate: Date;
 	private _currentLoadDay: Date;
@@ -27,8 +26,11 @@ export class HabitTimeline {
 		return this._lastUpdate;
 	}
 
-	get daysFromLastUpdate(): number {
-		return this._daysFromLastUpdate;
+	get daysFromPositiveUpdate(): number {
+		return this.getDaysBetween(
+			this.getLastPositiveUpdate(),
+			this._currentLoadDay
+		);
 	}
 
 	get isIncreasedToday(): boolean {
@@ -57,33 +59,24 @@ export class HabitTimeline {
 	}
 
 	isShouldDecrease(fallDayStep: number): boolean {
-		this._daysFromLastUpdate = this.getDaysBetween(
-			this._lastUpdate,
-			this._currentLoadDay
-		);
+		const daysFromLastUpdate = this.getDaysFromLastUpdate();
 		return (
 			//why checking for positive update anyway, if lat update should be newer ir equal?
-			this._daysFromLastUpdate >= fallDayStep &&
+			daysFromLastUpdate >= fallDayStep &&
 			this.isPositiveUpdateOlderThanFallStep(fallDayStep)
 		);
 	}
 
 	getDayDifferenceFromLastUpdate(): number {
-		this._daysFromLastUpdate = this.getDaysBetween(
-			this._lastUpdate,
-			this._currentLoadDay
-		);
+		const daysFromLastUpdate = this.getDaysFromLastUpdate();
 
-		const daysFromPositiveUpdate = this.getDaysBetween(
-			this.getLastPositiveUpdate(),
-			this._currentLoadDay
-		);
+		const daysFromPositiveUpdate = this.daysFromPositiveUpdate;
 
-		if (this._daysFromLastUpdate === daysFromPositiveUpdate) {
+		if (daysFromLastUpdate === daysFromPositiveUpdate) {
 			const forgiveDayForPositiveUpdate = 1;
-			return this._daysFromLastUpdate - forgiveDayForPositiveUpdate;
+			return daysFromLastUpdate - forgiveDayForPositiveUpdate;
 		} else {
-			return this._daysFromLastUpdate;
+			return daysFromLastUpdate;
 		}
 	}
 
@@ -111,6 +104,10 @@ export class HabitTimeline {
 			this.getLastPositiveUpdate().getTime() + DAY_MS * fallDayStep <
 			this._currentLoadDay.getTime()
 		);
+	}
+
+	private getDaysFromLastUpdate() {
+		return this.getDaysBetween(this._lastUpdate, this._currentLoadDay);
 	}
 
 	//test! Math.trunc is sus here

@@ -73,8 +73,8 @@ export class Habit {
 		return this._habitDate.lastUpdate;
 	}
 
-	get daysFromLastUpdate() {
-		return this._habitDate.daysFromLastUpdate;
+	get daysFromPositiveUpdate() {
+		return this._habitDate.daysFromPositiveUpdate;
 	}
 
 	getLastPositiveUpdate() {
